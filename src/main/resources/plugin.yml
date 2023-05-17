@@ -1,0 +1,4 @@
+name: Quest
+version: '${project.version}'
+main: atan.quest.Quest
+api-version: 1.19
