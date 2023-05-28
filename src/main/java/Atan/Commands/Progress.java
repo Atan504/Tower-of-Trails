@@ -1,6 +1,7 @@
-package atan.Commands;
+package Atan.Commands;
 
-import atan.Quests.Quest;
+import Atan.Data.SpigotData;
+import Atan.Quests.Quest;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,8 +13,7 @@ public class Progress implements CommandExecutor {
 
         if (commandSender instanceof Player) {
             Player p = (Player) commandSender;
-            Quest q = (Quest) p.getMetadata("Quest");
-            q.getCurrentState().finish();
+            ((Quest) SpigotData.getInstance().getEntity(p.getUniqueId()).get(0)).getCurrentState().finish();
         }
         return false;
     }

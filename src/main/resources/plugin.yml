@@ -1,4 +1,18 @@
-name: Quest
-version: '${project.version}'
-main: atan.quest.Quest
+name: Tower_of_trails
+version: '0.1'
+main: Atan.Main
 api-version: 1.19
+
+commands:
+  progress:
+    description: progress
+    usage: /<command>
+  queststatus:
+    description: queststatus
+    usage: /<command>
+  startquest:
+    description: queststatus
+    usage: /<command>
+  quests:
+    description: queststatus
+    usage: /<command>

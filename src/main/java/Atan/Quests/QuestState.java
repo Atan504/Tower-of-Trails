@@ -1,16 +1,34 @@
-package atan.Quests;
+package Atan.Quests;
 
-public class QuestState {
+import org.bukkit.inventory.ItemStack;
+
+import java.io.Serializable;
+
+public class QuestState implements Serializable {
     private Quest Quest;
-    public String info;
-    public QuestState(String info) {
+    private String info;
+    private ItemStack icon;
+
+    public QuestState(String info, Quest q) {
         this.info = info;
+        this.Quest =q;
     }
+
+    public QuestState(Atan.Quests.Quest quest, String info, ItemStack icon) {
+        Quest = quest;
+        this.info = info;
+        this.icon = icon;
+    }
+
     public void finish(){
-        Quest.progress(this);
+        Quest.progress();
     }
 
     public String getInfo() {
         return info;
+    }
+
+    public Atan.Quests.Quest getQuest() {
+        return Quest;
     }
 }

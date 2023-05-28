@@ -1,6 +1,7 @@
-package atan.Commands;
+package Atan.Commands;
 
-import atan.Quests.Quest;
+import Atan.Data.SpigotData;
+import Atan.Quests.Quest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,8 +13,8 @@ public class QuestStatus implements CommandExecutor {
 
         if (commandSender instanceof Player) {
             Player p = (Player) commandSender;
-            Quest q = (Quest) p.getMetadata("Quest");
-            p.sendMessage(q.getCurrentState().getInfo());
+            p.sendMessage(SpigotData.getInstance().toString());
+            p.sendMessage(((Quest) SpigotData.getInstance().getEntity(p.getUniqueId()).get(0)).getCurrentState().getInfo());
         }
         return true;
     }
