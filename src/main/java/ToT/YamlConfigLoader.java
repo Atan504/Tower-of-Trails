@@ -1,4 +1,4 @@
-package Atan;
+package ToT;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 

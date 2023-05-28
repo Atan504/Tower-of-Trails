@@ -1,8 +1,8 @@
-package Atan.Listener;
+package ToT.Listener;
 
-import Atan.CustomMenu;
-import Atan.Main;
-import Atan.Utils;
+import ToT.CustomMenu;
+import ToT.Main;
+import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,6 +1,6 @@
-package Atan.Commands;
+package ToT.Commands;
 
-import Atan.GUI.QuestsGUI;
+import ToT.GUI.QuestsGUI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -1,12 +1,12 @@
-package Atan;
+package ToT;
 
-import Atan.Commands.Quests;
-import Atan.Data.SpigotData;
-import Atan.Commands.Progress;
-import Atan.Commands.QuestStatus;
-import Atan.Commands.StartQuest;
-import Atan.GUI.QuestsGUI;
-import Atan.Listener.*;
+import ToT.Commands.Quests;
+import ToT.Data.SpigotData;
+import ToT.Commands.Progress;
+import ToT.Commands.QuestStatus;
+import ToT.Commands.StartQuest;
+import ToT.GUI.QuestsGUI;
+import ToT.Listener.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package Atan.Quests;
+package ToT.Quests;
 
 import java.io.Serializable;
 import java.util.LinkedList;

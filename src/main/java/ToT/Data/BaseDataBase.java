@@ -1,4 +1,4 @@
-package Atan.Data;
+package ToT.Data;
 
 import java.io.*;
 import java.nio.file.Files;

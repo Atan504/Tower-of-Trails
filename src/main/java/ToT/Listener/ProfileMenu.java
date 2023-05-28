@@ -1,6 +1,6 @@
-package Atan.Listener;
+package ToT.Listener;
 
-import Atan.CustomMenu;
+import ToT.CustomMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

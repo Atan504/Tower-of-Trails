@@ -1,4 +1,4 @@
-package Atan;
+package ToT;
 
 import fabulus.fabulus.PlayerData;
 import org.bukkit.ChatColor;

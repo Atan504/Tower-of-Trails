@@ -1,4 +1,4 @@
-package Atan;
+package ToT;
 
 import fabulus.fabulus.ClassManagement.ClasssList;
 import fabulus.fabulus.ClassManagement.Skill;

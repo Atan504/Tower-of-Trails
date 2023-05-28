@@ -1,6 +1,6 @@
 name: Tower_of_trails
 version: '0.1'
-main: Atan.Main
+main: ToT.Main
 api-version: 1.19
 
 commands:

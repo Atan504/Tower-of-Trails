@@ -1,8 +1,8 @@
-package Atan.Commands;
+package ToT.Commands;
 
-import Atan.Data.SpigotData;
-import Atan.Quests.Quest;
-import Atan.Quests.QuestState;
+import ToT.Data.SpigotData;
+import ToT.Quests.Quest;
+import ToT.Quests.QuestState;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

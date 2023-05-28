@@ -1,8 +1,7 @@
-package Atan.GUI;
+package ToT.GUI;
 
 
-import Atan.Data.SpigotData;
-import Atan.Quests.QuestManger;
+import ToT.Quests.QuestManger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 public class QuestsGUI implements Listener {
 
