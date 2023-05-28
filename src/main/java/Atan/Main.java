@@ -6,20 +6,38 @@ import Atan.Commands.Progress;
 import Atan.Commands.QuestStatus;
 import Atan.Commands.StartQuest;
 import Atan.GUI.QuestsGUI;
+import Atan.Listener.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 public final class Main extends JavaPlugin {
+
+    public static Main plugin;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
 
-        this.getCommand("progress").setExecutor(new Progress());
-        this.getCommand("queststatus").setExecutor(new QuestStatus());
-        this.getCommand("startquest").setExecutor(new StartQuest());
-        this.getCommand("quests").setExecutor(new Quests());
+        plugin = this;
+
+        Objects.requireNonNull(this.getCommand("progress")).setExecutor(new Progress());
+        Objects.requireNonNull(this.getCommand("queststatus")).setExecutor(new QuestStatus());
+        Objects.requireNonNull(this.getCommand("startquest")).setExecutor(new StartQuest());
+        Objects.requireNonNull(this.getCommand("quests")).setExecutor(new Quests());
 
         getServer().getPluginManager().registerEvents(new QuestsGUI(), this);
+
+
+
+
+
+        getServer().getPluginManager().registerEvents(new PlayerChat(), this);
+        getServer().getPluginManager().registerEvents(new SkillSelector(), this);
+        getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
+
+        Tasks.updateStats();
+        YamlConfigLoader.createAllConfig();
     }
 
     @Override
