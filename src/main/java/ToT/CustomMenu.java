@@ -1,8 +1,7 @@
 package ToT;
 
-import fabulus.fabulus.ClassManagement.ClasssList;
-import fabulus.fabulus.ClassManagement.Skill;
-import fabulus.fabulus.PlayerData;
+import ToT.ClassManagement.ClassList;
+import ToT.ClassManagement.Skill;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,7 +22,7 @@ public class CustomMenu {
     public static Inventory skills_select;
     public static Inventory profile_menu;
 
-    public static List<Skill> skills = ClasssList.list.get(0).getSkills();
+    public static List<Skill> skills = ClassList.list.get(0).getSkills();
 
     public static Integer getSlot(Inventory inv, String item) {
         for (int i = 0; i < inv.getSize(); i++) {
@@ -166,6 +165,7 @@ public class CustomMenu {
                 lore.set(1, ChatColor.GRAY + "Current " + displayName + ": " + color + (old_pd_data) + "/" + max / mod + arrows + color + (old_pd_data + 1) + "/" + max / mod);
             }
         } else {
+            assert pd_format != null;
             pd.set(pd_format, old_pd_data + (amount * multiply));
             lore.set(1, ChatColor.GRAY + "Current " + displayName + ": " + color + (old_pd_data + (amount * multiply)) + arrows + color + ((old_pd_data + (amount * multiply)) + (multiply)));
         }
@@ -174,7 +174,6 @@ public class CustomMenu {
         item.setItemMeta(meta);
 
         // int updated_amount = player.getMetadata("skills.point." + name).get(0).asInt();
-        assert data_name != null;
         int updated_amount = Utils.getData(pd, data_name);
 
         item.setAmount(Math.min(Math.max(updated_amount, 1), 64));
