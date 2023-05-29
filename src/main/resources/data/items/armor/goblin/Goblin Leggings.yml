@@ -1,0 +1,13 @@
+name: Goblin Leggings
+displayName: §2Goblin Leggings
+set: Goblin
+type: IRON_LEGGINGS
+stats:
+  Coins: 5%
+  Health: 15
+rarity: COMMON
+unbreakable: false
+damage: 0
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"

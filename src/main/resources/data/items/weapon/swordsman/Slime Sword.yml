@@ -1,0 +1,14 @@
+name: Slime Sword
+displayName: §aSlime Sword
+className: swordsman
+type: IRON_SWORD
+rarity: COMMON
+attackSpeed: Normal
+stats:
+  Strength: 2
+  Mana: 5
+unbreakable: false
+damage: 0
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"
