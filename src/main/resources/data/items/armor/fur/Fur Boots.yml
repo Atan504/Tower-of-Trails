@@ -1,0 +1,13 @@
+name: Fur Boots
+displayName: §8Fur Boots
+set: Fur
+type: LEATHER_BOOTS
+stats:
+  Health: 15
+rarity: COMMON
+unbreakable: false
+damage: 0
+color: 135,135,135
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"

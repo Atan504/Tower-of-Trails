@@ -1,0 +1,13 @@
+name: Goblin Helmet
+displayName: §2Goblin Helmet
+set: Goblin
+type: IRON_HELMET
+stats:
+  Coins: 5%
+  Health: 5
+rarity: COMMON
+unbreakable: false
+damage: 0
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"

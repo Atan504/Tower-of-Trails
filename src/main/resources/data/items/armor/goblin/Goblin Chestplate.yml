@@ -1,0 +1,13 @@
+name: Goblin Chestplate
+displayName: §2Goblin Chestplate
+set: Goblin
+type: IRON_CHESTPLATE
+rarity: COMMON
+stats:
+  Coins: 5%
+  Health: 25
+unbreakable: false
+damage: 0
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"
