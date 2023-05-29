@@ -7,7 +7,6 @@ import ToT.Commands.QuestStatus;
 import ToT.Commands.StartQuest;
 import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
-import fabulus.fabulus.ClassManagement.ClasssList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;

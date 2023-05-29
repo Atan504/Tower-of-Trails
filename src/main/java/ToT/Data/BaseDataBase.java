@@ -11,7 +11,7 @@ public class BaseDataBase {
         id,
     }
     private static BaseDataBase instance;
-    private File path;
+    private final File path;
 
     private int id;
 
@@ -89,7 +89,6 @@ public class BaseDataBase {
 //                return;
 //            }
 //        }
-        return;
     }
 
     public boolean isEmpty () throws IOException {
@@ -110,11 +109,11 @@ public class BaseDataBase {
         BufferedReader bufferedReader = new BufferedReader(fileReader);
 
         String lastLine = "";
-        String curruntLine="";
-        while ((curruntLine=bufferedReader.readLine()) != null){
-            lastLine=curruntLine;
+        String curruntLine = "";
+        while ((curruntLine = bufferedReader.readLine()) != null){
+            lastLine = curruntLine;
         }
-        String parameters[] = lastLine.split(":");
+        String[] parameters = lastLine.split(":");
         return Integer.parseInt(parameters[1]);
     }
 

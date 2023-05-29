@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Quest implements Serializable {
-    private String Name;
-    private Queue<QuestState> states;
+    private final String Name;
+    private final Queue<QuestState> states;
 
     public Quest(String name) {
         Name = name;

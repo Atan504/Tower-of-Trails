@@ -5,8 +5,8 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 
 public class QuestState implements Serializable {
-    private Quest Quest;
-    private String info;
+    private final Quest Quest;
+    private final String info;
     private ItemStack icon;
 
     public QuestState(String info, Quest q) {

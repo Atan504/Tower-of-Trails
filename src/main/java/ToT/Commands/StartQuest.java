@@ -6,11 +6,12 @@ import ToT.Quests.QuestState;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class StartQuest implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender commandSender, org.bukkit.command.Command command, String s, String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, org.bukkit.command.@NotNull Command command, @NotNull String s, String[] strings) {
 
         if (commandSender instanceof Player) {
             Player p = (Player) commandSender;
