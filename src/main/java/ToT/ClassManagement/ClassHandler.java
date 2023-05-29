@@ -23,6 +23,7 @@ public class ClassHandler implements Listener {
         Player p = e.getPlayer();
         PlayerData pd = new PlayerData(p.getUniqueId());
         for (Class cl : ClassList.list){
+
             List<Skill> AvailableSkills = new ArrayList<>();
             if (Objects.equals(pd.cla, cl.getClassName())){
                 for (Skill skill : cl.getSkills()){

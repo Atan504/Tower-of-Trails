@@ -1,5 +1,6 @@
 package ToT;
 
+import ToT.ClassManagement.Class;
 import ToT.ClassManagement.Skill;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
