@@ -2,8 +2,8 @@ package ToT.Listener;
 
 import ToT.CustomMenu;
 import ToT.Main;
+import ToT.PlayerData;
 import ToT.Utils;
-import fabulus.fabulus.PlayerData;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
