@@ -1,8 +1,7 @@
-package Atan.GUI;
+package ToT.GUI;
 
 
-import Atan.Data.SpigotData;
-import Atan.Quests.QuestManger;
+import ToT.Quests.QuestManger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 public class QuestsGUI implements Listener {
 
@@ -39,13 +37,13 @@ public class QuestsGUI implements Listener {
     // You can call this whenever you want to put the items in
     public void initializeItems() {
         inv.setItem(45, createGuiItem(Material.ARROW, ChatColor.WHITE + "Left"));
-        inv.setItem(46, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
-        inv.setItem(47, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
-        inv.setItem(48, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
+        inv.setItem(46, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
+        inv.setItem(47, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
+        inv.setItem(48, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
         inv.setItem(49, createGuiItem(Material.BARRIER, ChatColor.RED + "Left"));
-        inv.setItem(50, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
-        inv.setItem(51, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
-        inv.setItem(52, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + ""));
+        inv.setItem(50, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
+        inv.setItem(51, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
+        inv.setItem(52, createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, String.valueOf(ChatColor.DARK_GRAY)));
         inv.setItem(53, createGuiItem(Material.ARROW, ChatColor.WHITE + "Left"));
 
     }
@@ -56,6 +54,7 @@ public class QuestsGUI implements Listener {
         final ItemMeta meta = item.getItemMeta();
 
         // Set the name of the item
+        assert meta != null;
         meta.setDisplayName(name);
 
         // Set the lore of the item
@@ -91,7 +90,7 @@ public class QuestsGUI implements Listener {
 
         final Player p = (Player) e.getWhoClicked();
 
-        // Using slots click is a best option for your inventory click's
+        // Using slots click is the best option for your inventory click's
         p.sendMessage("You clicked at slot " + e.getRawSlot());
     }
 
