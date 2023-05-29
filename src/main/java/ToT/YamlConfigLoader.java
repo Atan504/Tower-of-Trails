@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 
+import static ToT.Main.plugin;
+
 public class YamlConfigLoader {
 
     public static void createAllConfig() {
@@ -24,10 +26,10 @@ public class YamlConfigLoader {
     }
 
     static void createCustomConfig(String path) {
-        File customConfigFile = new File(Main.plugin.getDataFolder(), path);
+        File customConfigFile = new File(plugin.getDataFolder(), path);
         if (!customConfigFile.exists()) {
             customConfigFile.getParentFile().mkdirs();
-            Main.plugin.saveResource(path, false);
+            plugin.saveResource(path, false);
         }
 
         YamlConfiguration.loadConfiguration(customConfigFile);

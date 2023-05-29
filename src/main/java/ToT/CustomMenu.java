@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static ToT.Main.plugin;
+
 public class CustomMenu {
 
     public static Inventory skills_selector;
@@ -124,7 +126,7 @@ public class CustomMenu {
         assert meta != null;
         List<String> lore = meta.getLore();
 
-        if(player.getMetadata("skills.point." + name).isEmpty()) player.setMetadata("skills.point" + name, new FixedMetadataValue(Main.plugin, 0));
+        if(player.getMetadata("skills.point." + name).isEmpty()) player.setMetadata("skills.point" + name, new FixedMetadataValue(plugin, 0));
 
         int data = player.getMetadata("skills.point." + name).get(0).asInt();
 
@@ -136,7 +138,7 @@ public class CustomMenu {
 
         if(points_amount_math < 0) return;
 
-        player.setMetadata("skills.point.count", new FixedMetadataValue(Main.plugin, points_amount_math));
+        player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, points_amount_math));
 
         ItemStack item2 = inv.getItem(4);
         assert item2 != null;
@@ -148,7 +150,7 @@ public class CustomMenu {
 
         item2.setAmount(Math.min(Math.max(points_amount_math, 1), 64));
 
-        player.setMetadata("skills.point." + name, new FixedMetadataValue(Main.plugin, amount_math));
+        player.setMetadata("skills.point." + name, new FixedMetadataValue(plugin, amount_math));
 
         assert lore != null;
         if(max != 0) {
@@ -185,14 +187,14 @@ public class CustomMenu {
 
         PlayerData pd = new PlayerData(player.getUniqueId());
 
-        if(player.getMetadata("skills.point.mana").isEmpty()) player.setMetadata("skills.point.mana", new FixedMetadataValue(Main.plugin, 0));
-        if(player.getMetadata("skills.point.str").isEmpty()) player.setMetadata("skills.point.str", new FixedMetadataValue(Main.plugin, 0));
-        if(player.getMetadata("skills.point.hp").isEmpty()) player.setMetadata("skills.point.hp", new FixedMetadataValue(Main.plugin, 0));
-        if(player.getMetadata("skills.point.def").isEmpty()) player.setMetadata("skills.point.def", new FixedMetadataValue(Main.plugin, 0));
-        if(player.getMetadata("skills.point.speed").isEmpty()) player.setMetadata("skills.point.speed", new FixedMetadataValue(Main.plugin, 0));
-        if(player.getMetadata("skills.point.magic").isEmpty()) player.setMetadata("skills.point.magic", new FixedMetadataValue(Main.plugin, 0));
+        if(player.getMetadata("skills.point.mana").isEmpty()) player.setMetadata("skills.point.mana", new FixedMetadataValue(plugin, 0));
+        if(player.getMetadata("skills.point.str").isEmpty()) player.setMetadata("skills.point.str", new FixedMetadataValue(plugin, 0));
+        if(player.getMetadata("skills.point.hp").isEmpty()) player.setMetadata("skills.point.hp", new FixedMetadataValue(plugin, 0));
+        if(player.getMetadata("skills.point.def").isEmpty()) player.setMetadata("skills.point.def", new FixedMetadataValue(plugin, 0));
+        if(player.getMetadata("skills.point.speed").isEmpty()) player.setMetadata("skills.point.speed", new FixedMetadataValue(plugin, 0));
+        if(player.getMetadata("skills.point.magic").isEmpty()) player.setMetadata("skills.point.magic", new FixedMetadataValue(plugin, 0));
 
-        if(player.getMetadata("skills.point.count").isEmpty()) player.setMetadata("skills.point.count", new FixedMetadataValue(Main.plugin, pd.lvl * 2));
+        if(player.getMetadata("skills.point.count").isEmpty()) player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, pd.lvl * 2));
 
         if(Objects.equals(name, "profile_menu")) {
             profile_menu = Bukkit.createInventory(player, 45, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "        Profile Menu");
@@ -505,7 +507,7 @@ public class CustomMenu {
     }
 
     public static void openInventory(Player player, Inventory inventory) {
-        Bukkit.getScheduler().runTask(Main.plugin, () -> player.openInventory(inventory));
+        Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inventory));
     }
 
 }

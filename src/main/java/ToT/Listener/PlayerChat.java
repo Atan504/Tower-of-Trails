@@ -18,6 +18,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import static ToT.Main.plugin;
+
 public class PlayerChat implements Listener {
 
     @EventHandler
@@ -111,7 +114,7 @@ public class PlayerChat implements Listener {
         if(message.equals("FABULUS")) {
             event.setCancelled(true);
 
-            player.setMetadata("skills.point.count", new FixedMetadataValue(Main.plugin, 500));
+            player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, 500));
 
             player.sendMessage("YOU ARE THE TRUE FABULUS GOD!!!!!");
         }
@@ -119,7 +122,7 @@ public class PlayerChat implements Listener {
         if(message.equals("FABULOUS")) {
             event.setCancelled(true);
 
-            player.setMetadata("skills.point.count", new FixedMetadataValue(Main.plugin, 2));
+            player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, 2));
 
             player.sendMessage("YOU ARE NOT REAL FABULUS!!!!");
         }

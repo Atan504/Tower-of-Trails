@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ToT.Main.plugin;
 import static org.bukkit.Bukkit.getServer;
 
 public class Utils {
@@ -69,7 +70,7 @@ public class Utils {
     }
 
     public static ConfigurationSection getConfig(String filePath, String name, String target) {
-        String dirPath = Main.plugin.getDataFolder() + "/data/" + filePath;
+        String dirPath = plugin.getDataFolder() + "/data/" + filePath;
         String fileName = ChatColor.stripColor(name) + ".yml";
 
         try (Stream<Path> pathStream = Files.walk(Paths.get(dirPath))) {
@@ -498,7 +499,7 @@ public class Utils {
         player.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RED + " has unequipped a " + Objects.requireNonNull(item.getItemMeta()).getDisplayName());
         player.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RED + " has unequipped a " + Objects.requireNonNull(item.getItemMeta()).getDisplayName());
 
-        String dirPath = Main.plugin.getDataFolder() + "/data/items";
+        String dirPath = plugin.getDataFolder() + "/data/items";
         String fileName = name + ".yml";
 
         try (var paths = Files.walk(Paths.get(dirPath))) {
@@ -575,7 +576,7 @@ public class Utils {
     public static List<ItemStack> getItems(String location) {
         ArrayList<ItemStack> list = new ArrayList<>();
 
-        Path path = Paths.get(Main.plugin.getDataFolder() + "/data/" + location);
+        Path path = Paths.get(plugin.getDataFolder() + "/data/" + location);
         try (Stream<Path> walk = Files.walk(path)) {
             List<Path> ymlFiles = walk
                     .filter(Files::isRegularFile)
@@ -637,7 +638,7 @@ public class Utils {
 
         if(set != null) {
 
-            File yamlFile2 = new File(Main.plugin.getDataFolder() + "/data/sets/" + set + ".yml");
+            File yamlFile2 = new File(plugin.getDataFolder() + "/data/sets/" + set + ".yml");
 
             // Load the YAML file into a ConfigurationSection
             YamlConfiguration yamlConfig2 = new YamlConfiguration();

@@ -8,11 +8,13 @@ import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
 
+import static ToT.Main.plugin;
+
 public class Tasks {
 
     public static void updateStats() {
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.plugin, () -> {
-            for (Player p : Main.plugin.getServer().getOnlinePlayers()) {
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
 
                 // Item Change
                 ItemStack item = p.getInventory().getItemInMainHand();
@@ -28,17 +30,17 @@ public class Tasks {
                 if (items.contains(item)) {
                     if (weapon_values.isEmpty()) {
                         Utils.addStats(p, item);
-                        p.setMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), new FixedMetadataValue(Main.plugin, item));
+                        p.setMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), new FixedMetadataValue(plugin, item));
                     } else {
                         if(!weapon_values.get(0).equals(item)) {
                             Utils.removeStats(p, (ItemStack) weapon_values.get(0));
-                            p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), Main.plugin);
+                            p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), plugin);
                         }
                     }
                 } else {
                     if (!weapon_values.isEmpty()) {
                         Utils.removeStats(p, (ItemStack) weapon_values.get(0));
-                        p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), Main.plugin);
+                        p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), plugin);
                     }
                 }
 
@@ -57,17 +59,17 @@ public class Tasks {
                     if (helmet_values.isEmpty()) {
                         assert helmet != null;
                         Utils.addStats(p, helmet);
-                        p.setMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), new FixedMetadataValue(Main.plugin, helmet));
+                        p.setMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), new FixedMetadataValue(plugin, helmet));
                     } else {
                         if(!helmet_values.get(0).equals(helmet)) {
                             Utils.removeStats(p, (ItemStack) helmet_values.get(0));
-                            p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), Main.plugin);
+                            p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), plugin);
                         }
                     }
                 } else {
                     if (!helmet_values.isEmpty()) {
                         Utils.removeStats(p, (ItemStack) helmet_values.get(0));
-                        p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), Main.plugin);
+                        p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), plugin);
                     }
                 }
 
@@ -78,17 +80,17 @@ public class Tasks {
                     if (chestplate_values.isEmpty()) {
                         assert chestplate != null;
                         Utils.addStats(p, chestplate);
-                        p.setMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), new FixedMetadataValue(Main.plugin, chestplate));
+                        p.setMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), new FixedMetadataValue(plugin, chestplate));
                     } else {
                         if(!chestplate_values.get(0).equals(chestplate)) {
                             Utils.removeStats(p, (ItemStack) chestplate_values.get(0));
-                            p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), Main.plugin);
+                            p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), plugin);
                         }
                     }
                 } else {
                     if (!chestplate_values.isEmpty()) {
                         Utils.removeStats(p, (ItemStack) chestplate_values.get(0));
-                        p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), Main.plugin);
+                        p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), plugin);
                     }
                 }
 
@@ -99,17 +101,17 @@ public class Tasks {
                     if (leggings_values.isEmpty()) {
                         assert leggings != null;
                         Utils.addStats(p, leggings);
-                        p.setMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), new FixedMetadataValue(Main.plugin, leggings));
+                        p.setMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), new FixedMetadataValue(plugin, leggings));
                     } else {
                         if(!leggings_values.get(0).equals(leggings)) {
                             Utils.removeStats(p, (ItemStack) leggings_values.get(0));
-                            p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), Main.plugin);
+                            p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), plugin);
                         }
                     }
                 } else {
                     if (!leggings_values.isEmpty()) {
                         Utils.removeStats(p, (ItemStack) leggings_values.get(0));
-                        p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), Main.plugin);
+                        p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), plugin);
                     }
                 }
 
@@ -120,17 +122,17 @@ public class Tasks {
                     if (boots_values.isEmpty()) {
                         assert boots != null;
                         Utils.addStats(p, boots);
-                        p.setMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), new FixedMetadataValue(Main.plugin, boots));
+                        p.setMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), new FixedMetadataValue(plugin, boots));
                     } else {
                         if(!boots_values.get(0).equals(boots)) {
                             Utils.removeStats(p, (ItemStack) boots_values.get(0));
-                            p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), Main.plugin);
+                            p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), plugin);
                         }
                     }
                 } else {
                     if (!boots_values.isEmpty()) {
                         Utils.removeStats(p, (ItemStack) boots_values.get(0));
-                        p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), Main.plugin);
+                        p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), plugin);
                     }
                 }
 

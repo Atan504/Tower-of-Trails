@@ -20,6 +20,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ToT.Main.plugin;
+
 public class SkillSelector implements Listener {
 
     @EventHandler
@@ -84,7 +86,7 @@ public class SkillSelector implements Listener {
                             meta.setDisplayName(org.bukkit.ChatColor.GREEN + "[" + org.bukkit.ChatColor.GREEN + clickedItem.getItemMeta().getDisplayName() + org.bukkit.ChatColor.GREEN + "] Skill Slot #" + number);
                             item2.setItemMeta(meta);
                             skills_selector.setItem(i, item2);
-                            player.setMetadata("skills.slot." + number, new FixedMetadataValue(Main.plugin, org.bukkit.ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())));
+                            player.setMetadata("skills.slot." + number, new FixedMetadataValue(plugin, org.bukkit.ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())));
                         }
                     }
                     CustomMenu.openInventory(player, CustomMenu.getInventory(player, "skills_selector", 0));
