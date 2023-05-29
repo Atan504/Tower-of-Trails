@@ -1,0 +1,10 @@
+name: Fur
+stats:
+  Speed: 2
+  Defense: 1
+if:
+  time:
+    day:
+      Damage: 10%
+    night:
+      Damage: 25%

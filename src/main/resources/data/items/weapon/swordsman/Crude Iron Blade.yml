@@ -1,0 +1,15 @@
+name: Crude Iron Blade
+displayName: §7Crude Iron Blade
+className: swordsman
+type: IRON_SWORD
+rarity: COMMON
+attackSpeed: Normal
+stats:
+  Strength: 3
+  Health: 10
+  Speed: 2
+unbreakable: false
+damage: 0
+flags:
+  - "HIDE_ATTRIBUTES"
+  - "HIDE_UNBREAKABLE"
