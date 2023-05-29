@@ -1,6 +1,5 @@
 package ToT;
 
-import fabulus.fabulus.PlayerData;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;

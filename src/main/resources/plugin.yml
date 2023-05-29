@@ -16,3 +16,9 @@ commands:
   quests:
     description: queststatus
     usage: /<command>
+  reset:
+    description: Reset.
+    usage: /<command>
+  jreload:
+    description: jreload.
+    usage: /<command>
