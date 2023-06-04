@@ -1,7 +1,6 @@
 package ToT.Listener;
 
 import ToT.CustomMenu;
-import ToT.Main;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ToT.Main.plugin;
 
@@ -72,7 +70,7 @@ public class SkillSelector implements Listener {
             } else {
 
                 String[] args = org.bukkit.ChatColor.stripColor(event.getView().getTitle()).split(" ");
-                List<String> list = Arrays.stream(args).filter(ele -> ele.length() != 0).collect(Collectors.toList());
+                List<String> list = Arrays.stream(args).filter(ele -> ele.length() != 0).toList();
                 int number = Integer.parseInt(list.get(list.size() - 1).replace("#", ""));
 
                 if (CustomMenu.skills.stream()

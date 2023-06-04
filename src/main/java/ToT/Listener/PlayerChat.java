@@ -1,11 +1,15 @@
 package ToT.Listener;
 
 import ToT.CustomMenu;
-import ToT.Main;
 import ToT.PlayerData;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,14 +18,66 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 import static ToT.Main.plugin;
 
+class TextComponentUtil {
+
+    public static BaseComponent[] append(BaseComponent[] baseComponents, BaseComponent... components) {
+        BaseComponent[] newComponents = new BaseComponent[baseComponents.length + components.length];
+        System.arraycopy(baseComponents, 0, newComponents, 0, baseComponents.length);
+        System.arraycopy(components, 0, newComponents, baseComponents.length, components.length);
+        return newComponents;
+    }
+}
 public class PlayerChat implements Listener {
+
+    private String itemToBase64(ItemStack itemStack) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeObject(itemStack);
+            dataOutput.close();
+            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private BaseComponent[] getItemHoverTextComponents(ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        int number = 1;
+
+        if(itemMeta.hasEnchants()) number++;
+        if(itemMeta.hasLore()) number++;
+
+        BaseComponent[] hoverTextComponents = new BaseComponent[number];
+
+        // First line: Display name
+        if(itemMeta.hasDisplayName()) hoverTextComponents[0] = new TextComponent(itemMeta.getDisplayName());
+        else hoverTextComponents[0] = new TextComponent(String.valueOf(itemStack.getType()));
+
+        if(itemMeta.hasEnchants()) {
+            ArrayList<String> enchantmentsText = new ArrayList<>();
+            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
+                enchantmentsText.add("\n" + enchantment.getKey().getKey() + " " + itemMeta.getEnchantLevel(enchantment));
+            }
+            hoverTextComponents[1] = new TextComponent(ChatColor.GRAY + String.join("", enchantmentsText));
+        }
+
+        if (itemMeta.hasLore()) {
+            hoverTextComponents[2] = new TextComponent(ChatColor.GRAY + String.join("\n", Objects.requireNonNull(itemMeta.getLore())));
+        }
+
+        return hoverTextComponents;
+    }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -125,6 +181,45 @@ public class PlayerChat implements Listener {
             player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, 2));
 
             player.sendMessage("YOU ARE NOT REAL FABULUS!!!!");
+        }
+
+        if(message.contains("[item]")) {
+
+            String new_message = "<" + player.getDisplayName() + "> " + message;
+
+            String[] parts = new_message.split("\\[item\\]", -1);
+
+            BaseComponent[] messageComponents = new BaseComponent[0];
+
+            for (String part : parts) {
+                TextComponent textComponent = new TextComponent(part);
+
+                ItemStack item = player.getInventory().getItemInMainHand();
+                if (item.getType() != Material.AIR) {
+                    ItemMeta itemMeta = item.getItemMeta();
+                    if (itemMeta != null && itemMeta.hasDisplayName()) {
+                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
+                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
+                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
+
+                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
+                    } else {
+                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + item.getType() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
+                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
+                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
+
+                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
+                    }
+                }
+
+                messageComponents = TextComponentUtil.append(messageComponents, textComponent);
+            }
+
+            for(Player p : plugin.getServer().getOnlinePlayers()) {
+                p.spigot().sendMessage(ChatMessageType.CHAT, messageComponents);
+            }
+
+            event.setCancelled(true);
         }
 
         if(message.equals("wynncraft")) {

@@ -146,8 +146,10 @@ public class Utils {
             if (value instanceof Double) {
                 value = (int) (stat_value * ((double) value + 1));
                 stat_name = "Strength";
+                assert data_name != null;
                 pd.set(data_name, value);
             } else {
+                assert data_name != null;
                 pd.set(data_name, stat_value + (int) value);
             }
 
@@ -169,8 +171,10 @@ public class Utils {
             if (value instanceof Double) {
                 value = (int) (stat_value * ((double) value + 1));
                 stat_name = "Strength";
+                assert data_name != null;
                 pd.set(data_name, value);
             } else {
+                assert data_name != null;
                 pd.set(data_name, stat_value - (int) value);
             }
 
@@ -581,7 +585,7 @@ public class Utils {
             List<Path> ymlFiles = walk
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".yml"))
-                    .collect(Collectors.toList());
+                    .toList();
 
             ymlFiles.forEach(file -> {
                 try {
