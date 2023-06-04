@@ -3,10 +3,10 @@ package ToT.Objects;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class Entity implements Serializable {
+public class TEntity implements Serializable {
     private UUID uuid;
 
-    public Entity(UUID uuid) {
+    public TEntity(UUID uuid) {
         this.uuid = uuid;
     }
 

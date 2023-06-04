@@ -1,5 +1,10 @@
 package ToT.Data;
 
+import ToT.Objects.TEntity;
+import ToT.Objects.TPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.io.*;
 import java.util.*;
 
@@ -7,7 +12,7 @@ import java.util.*;
 public class SpigotData implements Serializable {
     //(TODO) every object that is inserted into the Data needs to implement Serializable.
     private static SpigotData s = null;
-    HashMap<UUID, LinkedList<Object>> map;
+    HashMap<UUID, TEntity> map;
 
     private SpigotData() {
         map = new HashMap<>();
@@ -30,10 +35,14 @@ public class SpigotData implements Serializable {
     }
 
     public void enterEntity(UUID e) {
-        map.putIfAbsent(e, new LinkedList<>());
+
+        if (Bukkit.getPlayer(e) instanceof Player)
+            map.putIfAbsent(e, new TPlayer(e));
+        else
+            map.putIfAbsent(e, new TEntity(e));
     }
 
-    public LinkedList getEntity(UUID e) {
+    public TEntity getEntity(UUID e) {
         return map.get(e);
     }
 
