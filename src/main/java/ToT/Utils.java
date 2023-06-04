@@ -69,6 +69,44 @@ public class Utils {
         return "NONE";
     }
 
+    public static void addToArray(int[] arr,int[] value){
+        for (int i = 0; i < value.length; i++) {
+            arr[i]+=value[i];
+        }
+    }
+
+    public static int[] sumArrays(int[][] arr){
+        int[] res = new int[arr[0].length];
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                res[j]+=arr[i][j];
+            }
+        }
+        return res;
+    }
+
+    public static int[] getItemStats(ItemStack item) {
+
+        if(item == null) return new int[]{ 0, 0, 0, 0, 0, 0 };
+        if(!item.hasItemMeta()) return new int[]{ 0, 0, 0, 0, 0, 0 };
+        if(!item.getItemMeta().hasDisplayName()) return new int[]{ 0, 0, 0, 0, 0, 0 };
+
+        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "stats");
+
+        if(config == null) return new int[]{ 0, 0, 0, 0, 0, 0};
+
+        int mana,str,hp,def,speed,magic;
+
+        mana = config.getInt("Mana");
+        str = config.getInt("Strength");
+        hp = config.getInt("Health");
+        def = config.getInt("Defense");
+        speed = config.getInt("Speed");
+        magic = config.getInt("Magic");
+
+        return new int[]{ mana, str, hp, def, speed, magic };
+    }
+
     public static ConfigurationSection getConfig(String filePath, String name, String target) {
         String dirPath = plugin.getDataFolder() + "/data/" + filePath;
         String fileName = ChatColor.stripColor(name) + ".yml";

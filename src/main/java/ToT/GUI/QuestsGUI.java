@@ -73,14 +73,14 @@ public class QuestsGUI implements Listener {
     // Check for clicks on items
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent e) {
-        System.out.println(e.getInventory());
-        System.out.println(inv);
+        //System.out.println(e.getInventory());
+        //System.out.println(inv);
         if (!e.getInventory().equals(inv)) {
-            e.getWhoClicked().sendMessage("bilbil");
+            // e.getWhoClicked().sendMessage("bilbil");
             return;
         }
 
-        System.out.println("sdsdsdsd");
+        // System.out.println("sdsdsdsd");
         e.setCancelled(true);
 
         final ItemStack clickedItem = e.getCurrentItem();

@@ -1,7 +1,9 @@
 package ToT.Listener;
 
 import ToT.CustomMenu;
-import ToT.PlayerData;
+import ToT.Data.SpigotData;
+import ToT.Objects.TPlayer;
+import ToT.Tasks;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
@@ -133,7 +135,7 @@ public class PlayerChat implements Listener {
             CustomMenu.openInventory(player, CustomMenu.getInventory(player, "profile_menu", 0));
         }
 
-        if (message.startsWith("stats")) {
+        /*if (message.startsWith("stats")) {
             event.setCancelled(true);
 
             PlayerData pd = new PlayerData(player.getUniqueId());
@@ -165,6 +167,16 @@ public class PlayerChat implements Listener {
                     pd.set("magic", Integer.parseInt(args[3]));
                 }
             }
+        }*/
+
+        if(message.equals("stats")) {
+            Tasks.updateStats();
+            int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
+
+            for(int stat : stats) {
+                player.sendMessage(String.valueOf(stat));
+            }
+
         }
 
         if(message.equals("FABULUS")) {

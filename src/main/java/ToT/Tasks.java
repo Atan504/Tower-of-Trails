@@ -1,11 +1,12 @@
 package ToT;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import ToT.Data.SpigotData;
+import ToT.Objects.TPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.List;
 
@@ -13,50 +14,79 @@ import static ToT.Main.plugin;
 
 public class Tasks {
 
-    static final Gson gson = new GsonBuilder().create();
+    public static String getSet(ItemStack item) {
+        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "");
 
-    public static void saveItemStackAsMetadata(Player player, String key, ItemStack itemStack) {
-        String itemStackJson = gson.toJson(itemStack);
-        player.setMetadata(key, new FixedMetadataValue(plugin, itemStackJson));
-    }
-
-    public static ItemStack retrieveItemStackFromMetadata(Player player, String key) {
-        if (player.hasMetadata(key)) {
-            String itemStackJson = player.getMetadata(key).get(0).asString();
-            return gson.fromJson(itemStackJson, ItemStack.class);
-        }
-        return null;
+        return config.getString("set");
     }
 
     public static void updateStats() {
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
 
+                SpigotData.getInstance().enterEntity(p.getUniqueId());
+
+                TPlayer TP = ((TPlayer) SpigotData.getInstance().getEntity(p.getUniqueId()));
+
+                ItemStack weapon = p.getInventory().getItemInMainHand();
+                ItemStack helmet = p.getInventory().getHelmet();
+                ItemStack chestplate = p.getInventory().getChestplate();
+                ItemStack leggings = p.getInventory().getLeggings();
+                ItemStack boots = p.getInventory().getBoots();
+
+                int[] helmetStats = Utils.getItemStats(helmet);
+                int[] chestplateStats = Utils.getItemStats(chestplate);
+                int[] leggingsStats = Utils.getItemStats(leggings);
+                int[] bootsStats = Utils.getItemStats(boots);
+                int[] weaponStats = Utils.getItemStats(weapon);
+
+                int[] setBonus = new int[]{0,0,0,0,0,0};
+
+                if (getSet(helmet).equals(getSet(chestplate)) && getSet(chestplate).equals(getSet(leggings)) && getSet(leggings).equals(getSet(boots))) {
+                    ConfigurationSection stats = Utils.getConfig("sets", getSet(helmet), "stats");
+
+                    setBonus[0] = stats.getInt("Mana");
+                    setBonus[1] = stats.getInt("Strength");
+                    setBonus[2] = stats.getInt("Health");
+                    setBonus[3] = stats.getInt("Defense");
+                    setBonus[4] = stats.getInt("Speed");
+                    setBonus[5] = stats.getInt("Magic");
+                }
+
+                 int[][] totalStats = new int[][]{helmetStats,chestplateStats,leggingsStats,bootsStats,weaponStats,setBonus};
+
+                        TP.setStats(Utils.sumArrays(totalStats));
+
+                /*
                 // Item Change
                 ItemStack item = p.getInventory().getItemInMainHand();
 
                 List<ItemStack> items = Utils.list("items/weapon", item);
 
-                ItemStack weapon_value = retrieveItemStackFromMetadata(p, "playersWithModifiedStats.weapon." + p.getUniqueId());
-                ItemStack helmet_value = retrieveItemStackFromMetadata(p, "playersWithModifiedStats.helmet." + p.getUniqueId());
-                ItemStack chestplate_value = retrieveItemStackFromMetadata(p, "playersWithModifiedStats.chestplate." + p.getUniqueId());
-                ItemStack leggings_value = retrieveItemStackFromMetadata(p, "playersWithModifiedStats.leggings." + p.getUniqueId());
-                ItemStack boots_value = retrieveItemStackFromMetadata(p, "playersWithModifiedStats.boots." + p.getUniqueId());
+                ItemStack weapon_value = TP.getWeapon();
+                ItemStack helmet_value = TP.getArmors()[0];
+                ItemStack chestplate_value = TP.getArmors()[1];
+                ItemStack leggings_value = TP.getArmors()[2];
+                ItemStack boots_value = TP.getArmors()[3];
+
+                int[] stats = new int[6];
+                ItemStack[] armors = TP.getArmors();
 
                 if (items.contains(item)) {
                     if (weapon_value == null) {
+
                         Utils.addStats(p, item);
-                        saveItemStackAsMetadata(p, "playersWithModifiedStats.weapon." + p.getUniqueId(), item);
+                        TP.setWeapon(item);
                     } else {
                         if(!weapon_value.equals(item)) {
                             Utils.removeStats(p, weapon_value);
-                            p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), plugin);
+                            TP.setWeapon(null);
                         }
                     }
                 } else {
                     if (weapon_value != null) {
                         Utils.removeStats(p, weapon_value);
-                        p.removeMetadata("playersWithModifiedStats.weapon." + p.getUniqueId(), plugin);
+                        TP.setWeapon(null);
                     }
                 }
 
@@ -75,17 +105,17 @@ public class Tasks {
                     if (helmet_value == null) {
                         assert helmet != null;
                         Utils.addStats(p, helmet);
-                        saveItemStackAsMetadata(p, "playersWithModifiedStats.helmet." + p.getUniqueId(), helmet);
+                        TP.getArmors()[0] = helmet;
                     } else {
                         if(!helmet_value.equals(helmet)) {
                             Utils.removeStats(p, helmet_value);
-                            p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), plugin);
+                            TP.getArmors()[0] = null;
                         }
                     }
                 } else {
                     if (helmet_value != null) {
                         Utils.removeStats(p, helmet_value);
-                        p.removeMetadata("playersWithModifiedStats.helmet." + p.getUniqueId(), plugin);
+                        TP.getArmors()[0] = null;
                     }
                 }
 
@@ -96,17 +126,17 @@ public class Tasks {
                     if (chestplate_value == null) {
                         assert chestplate != null;
                         Utils.addStats(p, chestplate);
-                        saveItemStackAsMetadata(p, "playersWithModifiedStats.chestplate." + p.getUniqueId(), chestplate);
+                        TP.getArmors()[1] = chestplate;
                     } else {
                         if(!chestplate_value.equals(chestplate)) {
                             Utils.removeStats(p, chestplate_value);
-                            p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), plugin);
+                            TP.getArmors()[1] = null;
                         }
                     }
                 } else {
                     if (chestplate_value != null) {
                         Utils.removeStats(p, chestplate_value);
-                        p.removeMetadata("playersWithModifiedStats.chestplate." + p.getUniqueId(), plugin);
+                        TP.getArmors()[1] = null;
                     }
                 }
 
@@ -117,17 +147,17 @@ public class Tasks {
                     if (leggings_value == null) {
                         assert leggings != null;
                         Utils.addStats(p, leggings);
-                        saveItemStackAsMetadata(p, "playersWithModifiedStats.leggings." + p.getUniqueId(), leggings);
+                        TP.getArmors()[2] = leggings;
                     } else {
                         if(!leggings_value.equals(leggings)) {
                             Utils.removeStats(p, leggings_value);
-                            p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), plugin);
+                            TP.getArmors()[2] = null;
                         }
                     }
                 } else {
                     if (leggings_value != null) {
                         Utils.removeStats(p, leggings_value);
-                        p.removeMetadata("playersWithModifiedStats.leggings." + p.getUniqueId(), plugin);
+                        TP.getArmors()[2] = null;
                     }
                 }
 
@@ -138,19 +168,21 @@ public class Tasks {
                     if (boots_value == null) {
                         assert boots != null;
                         Utils.addStats(p, boots);
-                        saveItemStackAsMetadata(p, "playersWithModifiedStats.boots." + p.getUniqueId(), boots);
+                        TP.getArmors()[3] = boots;
                     } else {
                         if(!boots_value.equals(boots)) {
                             Utils.removeStats(p, boots_value);
-                            p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), plugin);
+                            TP.getArmors()[3] = null;
                         }
                     }
                 } else {
                     if (boots_value != null) {
                         Utils.removeStats(p, boots_value);
-                        p.removeMetadata("playersWithModifiedStats.boots." + p.getUniqueId(), plugin);
+                        TP.getArmors()[3] = null;
                     }
                 }
+
+                 */
 
                 // Time Change
                 /*World world = p.getWorld();
