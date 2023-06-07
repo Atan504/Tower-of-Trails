@@ -1,6 +1,8 @@
 package ToT.Listener;
 
 import ToT.CustomMenu;
+import ToT.Data.SpigotData;
+import ToT.Objects.TPlayer;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -14,11 +16,8 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.*;
-
-import static ToT.Main.plugin;
 
 public class SkillSelector implements Listener {
 
@@ -26,6 +25,9 @@ public class SkillSelector implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
 
         Player player = (Player) event.getWhoClicked();
+
+        SpigotData.getInstance().enterEntity(player.getUniqueId());
+        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
 
         if(!(Objects.requireNonNull(event.getClickedInventory()).getType().equals(InventoryType.CHEST) && Objects.equals(event.getClickedInventory().getHolder(), player))) return;
 
@@ -49,10 +51,10 @@ public class SkillSelector implements Listener {
                 skills_select = CustomMenu.getInventory(player, "skills_select", index);
 
                 for(var i = 3; i < 8; i++) {
-                    if(!player.getMetadata("skills.slot." + i).isEmpty()) {
+                    if(TP.getSkills()[i-3] != null) {
                         ItemStack item = new ItemStack(Material.RED_STAINED_GLASS_PANE);
                         ItemMeta meta = item.getItemMeta();
-                        String value = player.getMetadata("skills.slot." + i).get(0).asString();
+                        String value = TP.getSkills()[i-3];
                         assert meta != null;
                         meta.setDisplayName(org.bukkit.ChatColor.RED + "[" + org.bukkit.ChatColor.WHITE + org.bukkit.ChatColor.BOLD + value + org.bukkit.ChatColor.RED + "] Already in Slot #" + i);
                         item.setItemMeta(meta);
@@ -84,7 +86,7 @@ public class SkillSelector implements Listener {
                             meta.setDisplayName(org.bukkit.ChatColor.GREEN + "[" + org.bukkit.ChatColor.GREEN + clickedItem.getItemMeta().getDisplayName() + org.bukkit.ChatColor.GREEN + "] Skill Slot #" + number);
                             item2.setItemMeta(meta);
                             skills_selector.setItem(i, item2);
-                            player.setMetadata("skills.slot." + number, new FixedMetadataValue(plugin, org.bukkit.ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())));
+                            TP.getSkills()[number-3] = clickedItem.getItemMeta().getDisplayName();
                         }
                     }
                     CustomMenu.openInventory(player, CustomMenu.getInventory(player, "skills_selector", 0));
@@ -106,6 +108,10 @@ public class SkillSelector implements Listener {
     @EventHandler
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
+
+        SpigotData.getInstance().enterEntity(player.getUniqueId());
+        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
+
         int previousSlot = event.getPreviousSlot();
         int newSlot = event.getNewSlot();
         if(player.isSneaking() && Utils.list("items/weapon", player.getInventory().getItem(previousSlot)).contains(player.getInventory().getItem(previousSlot))) {
@@ -114,11 +120,11 @@ public class SkillSelector implements Listener {
             String skill = null;
 
             switch (newSlot) {
-                case 2 -> skill = player.getMetadata("skills.slot.3").get(0).asString();
-                case 3 -> skill = player.getMetadata("skills.slot.4").get(0).asString();
-                case 4 -> skill = player.getMetadata("skills.slot.5").get(0).asString();
-                case 5 -> skill = player.getMetadata("skills.slot.6").get(0).asString();
-                case 6 -> skill = player.getMetadata("skills.slot.7").get(0).asString();
+                case 2 -> skill = TP.getSkills()[0];
+                case 3 -> skill = TP.getSkills()[1];
+                case 4 -> skill = TP.getSkills()[2];
+                case 5 -> skill = TP.getSkills()[3];
+                case 6 -> skill = TP.getSkills()[4];
                 default -> {
                 }
             }

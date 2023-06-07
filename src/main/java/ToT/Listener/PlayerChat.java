@@ -3,41 +3,43 @@ package ToT.Listener;
 import ToT.CustomMenu;
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
-import ToT.Tasks;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginLoader;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.entity.Player;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Logger;
 
-import static ToT.Main.plugin;
-
-class TextComponentUtil {
-
-    public static BaseComponent[] append(BaseComponent[] baseComponents, BaseComponent... components) {
-        BaseComponent[] newComponents = new BaseComponent[baseComponents.length + components.length];
-        System.arraycopy(baseComponents, 0, newComponents, 0, baseComponents.length);
-        System.arraycopy(components, 0, newComponents, baseComponents.length, components.length);
-        return newComponents;
-    }
-}
-public class PlayerChat implements Listener {
+public class PlayerChat implements Listener, Plugin {
 
     private String itemToBase64(ItemStack itemStack) {
         try {
@@ -52,40 +54,123 @@ public class PlayerChat implements Listener {
         }
     }
 
+    private ItemStack getItemInMainHand(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.getType() != Material.AIR) {
+            return item;
+        }
+        return null;
+    }
+
+    private String getItemDisplayName(ItemStack item) {
+        if (item != null) {
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+            if (meta.hasDisplayName()) {
+                return meta.getDisplayName();
+            } else {
+                return item.getType().toString();
+            }
+        }
+        return "Unknown Item";
+    }
+
+    private void sendHoverText(Player player, String playerName, String message, ItemStack item) {
+        TextComponent textComponent = new TextComponent(playerName + ": " + message);
+
+        // Create a new TextComponent for the item with HoverEvent and SHOW_ITEM action
+        TextComponent itemComponent = new TextComponent("[" + getItemDisplayName(item) + "]");
+        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM,
+                new BaseComponent[]{new TextComponent(item.serialize().toString())}));
+
+        // Append the item component to the text component
+        textComponent.addExtra(itemComponent);
+
+        // Send the message to the player
+        player.spigot().sendMessage(textComponent);
+    }
+
+    public static String toProperCase(String str) {
+        StringBuilder properCase = new StringBuilder();
+
+        boolean capitalizeNext = true;
+        for (char c : str.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                c = Character.toTitleCase(c);
+                capitalizeNext = false;
+            }
+            properCase.append(c);
+        }
+
+        return properCase.toString();
+    }
+
+    public static String intToRoman(int num) {
+        String[] romanSymbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+
+        StringBuilder romanNumeral = new StringBuilder();
+        int index = 0;
+
+        while (num > 0) {
+            if (num >= values[index]) {
+                romanNumeral.append(romanSymbols[index]);
+                num -= values[index];
+            } else {
+                index++;
+            }
+        }
+
+        return romanNumeral.toString();
+    }
+
     private BaseComponent[] getItemHoverTextComponents(ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        int number = 1;
+        int number = 2;
 
+        assert itemMeta != null;
         if(itemMeta.hasEnchants()) number++;
         if(itemMeta.hasLore()) number++;
 
         BaseComponent[] hoverTextComponents = new BaseComponent[number];
 
+        ArrayList<BaseComponent> texts = new ArrayList<>();
+
         // First line: Display name
-        if(itemMeta.hasDisplayName()) hoverTextComponents[0] = new TextComponent(itemMeta.getDisplayName());
-        else hoverTextComponents[0] = new TextComponent(String.valueOf(itemStack.getType()));
+        if(itemMeta.hasDisplayName()) texts.add(new TextComponent(itemMeta.getDisplayName()));
+        else texts.add(new TextComponent(String.valueOf(itemStack.getType())));
 
         if(itemMeta.hasEnchants()) {
             ArrayList<String> enchantmentsText = new ArrayList<>();
             for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
-                enchantmentsText.add("\n" + enchantment.getKey().getKey() + " " + itemMeta.getEnchantLevel(enchantment));
+                enchantmentsText.add("\n" + toProperCase(enchantment.getKey().getKey()) + " " + intToRoman(itemMeta.getEnchantLevel(enchantment)));
             }
-            hoverTextComponents[1] = new TextComponent(ChatColor.GRAY + String.join("", enchantmentsText));
+            texts.add(new TextComponent(ChatColor.GRAY + String.join("", enchantmentsText)));
         }
 
-        if (itemMeta.hasLore()) {
-            hoverTextComponents[2] = new TextComponent(ChatColor.GRAY + String.join("\n", Objects.requireNonNull(itemMeta.getLore())));
+        if (itemMeta.hasLore()) texts.add(new TextComponent("\n" + ChatColor.GRAY + String.join("\n", Objects.requireNonNull(itemMeta.getLore()))));
+
+        texts.add(new TextComponent("\n " + ChatColor.DARK_GRAY + itemStack.getType().getKey()));
+
+        for(int i = 0; i < hoverTextComponents.length; i++) {
+            hoverTextComponents[i] = texts.get(i);
         }
 
         return hoverTextComponents;
     }
+
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
 
         Player player = event.getPlayer();
         String message = event.getMessage();
+
+        SpigotData.getInstance().enterEntity(player.getUniqueId());
+        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
 
         if (message.toLowerCase().startsWith("class")) {
             event.setCancelled(true);
@@ -135,54 +220,44 @@ public class PlayerChat implements Listener {
             CustomMenu.openInventory(player, CustomMenu.getInventory(player, "profile_menu", 0));
         }
 
-        /*if (message.startsWith("stats")) {
-            event.setCancelled(true);
-
-            PlayerData pd = new PlayerData(player.getUniqueId());
-
-            String[] args = event.getMessage().toLowerCase().split(" ");
-
-            if (args[2].equals("set")) {
-                if(args[1].equalsIgnoreCase("mana")) {
-                    pd.set("maxmana", Integer.parseInt(args[3]));
-                }
-
-                if(args[1].equalsIgnoreCase("strength")) {
-                    pd.set("str", Integer.parseInt(args[3]));
-                }
-
-                if(args[1].equalsIgnoreCase("health")) {
-                    pd.set("maxhp", Integer.parseInt(args[3]));
-                }
-
-                if(args[1].equalsIgnoreCase("defense")) {
-                    pd.set("def", Integer.parseInt(args[3]));
-                }
-
-                if(args[1].equalsIgnoreCase("speed")) {
-                    pd.set("spe", Integer.parseInt(args[3]));
-                }
-
-                if(args[1].equalsIgnoreCase("magic")) {
-                    pd.set("magic", Integer.parseInt(args[3]));
-                }
-            }
-        }*/
-
         if(message.equals("stats")) {
-            Tasks.updateStats();
+            event.setCancelled(true);
             int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
 
-            for(int stat : stats) {
-                player.sendMessage(String.valueOf(stat));
-            }
+            player.sendMessage("=-=-=-=-=-=-=-=-=-=-=-=");
+            player.sendMessage("Mana: " + stats[0]);
+            player.sendMessage("Max Mana: " + stats[1]);
+            player.sendMessage("Strength: " + stats[2]);
+            player.sendMessage("Health: " + stats[3]);
+            player.sendMessage("Max Health: " + stats[4]);
+            player.sendMessage("Defense: " + stats[5]);
+            player.sendMessage("Speed: " + stats[6]);
+            player.sendMessage("Magic: " + stats[7]);
+
+        }
+
+        if(message.equals("reset")) {
+            event.setCancelled(true);
+            int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
+
+            Arrays.fill(stats, 0);
+
+            player.sendMessage("=-=-=-=-=-=-=-=-=-=-=-=");
+            player.sendMessage("Mana: " + stats[0]);
+            player.sendMessage("Max Mana: " + stats[1]);
+            player.sendMessage("Strength: " + stats[2]);
+            player.sendMessage("Health: " + stats[3]);
+            player.sendMessage("Max Health: " + stats[4]);
+            player.sendMessage("Defense: " + stats[5]);
+            player.sendMessage("Speed: " + stats[6]);
+            player.sendMessage("Magic: " + stats[7]);
 
         }
 
         if(message.equals("FABULUS")) {
             event.setCancelled(true);
 
-            player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, 500));
+            TP.getPoints()[0] = 500;
 
             player.sendMessage("YOU ARE THE TRUE FABULUS GOD!!!!!");
         }
@@ -190,14 +265,32 @@ public class PlayerChat implements Listener {
         if(message.equals("FABULOUS")) {
             event.setCancelled(true);
 
-            player.setMetadata("skills.point.count", new FixedMetadataValue(plugin, 2));
+            TP.getPoints()[0] = 2;
 
             player.sendMessage("YOU ARE NOT REAL FABULUS!!!!");
         }
 
         if(message.contains("[item]")) {
 
-            String new_message = "<" + player.getDisplayName() + "> " + message;
+            /*Player sender = event.getPlayer();
+
+            // Run the task asynchronously to access the main hand item
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                ItemStack item = getItemInMainHand(sender);
+                String displayName = getItemDisplayName(item);
+
+                // Replace [item] with [item_in_main_hand_display_name]
+                message[0] = message[0].replace("[item]", "[" + displayName + "]");
+
+                // Send the modified message to all online players
+                Bukkit.getScheduler().runTask(this, () -> {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        sendHoverText(player, sender.getName(), message[0], item);
+                    }
+                });
+            });*/
+
+            /*String new_message = "<" + player.getDisplayName() + "> " + message;
 
             String[] parts = new_message.split("\\[item\\]", -1);
 
@@ -207,12 +300,22 @@ public class PlayerChat implements Listener {
                 TextComponent textComponent = new TextComponent(part);
 
                 ItemStack item = player.getInventory().getItemInMainHand();
+
                 if (item.getType() != Material.AIR) {
                     ItemMeta itemMeta = item.getItemMeta();
-                    if (itemMeta != null && itemMeta.hasDisplayName()) {
+                    if (itemMeta != null && itemMeta.hasDisplayName()) {*/
+                        /*
                         TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
                         BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
                         itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
+
+                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
+                         */
+
+                        /*TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
+                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
+                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().toString(),
+                                item.getAmount(), ItemTag.ofNbt(ItemStackReflection.getNBT(item)))));
 
                         if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
                     } else {
@@ -225,11 +328,11 @@ public class PlayerChat implements Listener {
                 }
 
                 messageComponents = TextComponentUtil.append(messageComponents, textComponent);
-            }
+            }*/
 
-            for(Player p : plugin.getServer().getOnlinePlayers()) {
-                p.spigot().sendMessage(ChatMessageType.CHAT, messageComponents);
-            }
+            /*for(Player p : plugin.getServer().getOnlinePlayers()) {
+                p.spigot().sendMessage(ChatMessageType.CHAT, test);
+            }*/
 
             event.setCancelled(true);
         }
@@ -286,4 +389,124 @@ public class PlayerChat implements Listener {
         return random.nextInt((max - min) + 1) + min;
     }
 
+    @NotNull
+    @Override
+    public File getDataFolder() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public PluginDescriptionFile getDescription() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public FileConfiguration getConfig() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public InputStream getResource(@NotNull String s) {
+        return null;
+    }
+
+    @Override
+    public void saveConfig() {
+
+    }
+
+    @Override
+    public void saveDefaultConfig() {
+
+    }
+
+    @Override
+    public void saveResource(@NotNull String s, boolean b) {
+
+    }
+
+    @Override
+    public void reloadConfig() {
+
+    }
+
+    @NotNull
+    @Override
+    public PluginLoader getPluginLoader() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public Server getServer() {
+        return null;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
+    @Override
+    public void onDisable() {
+
+    }
+
+    @Override
+    public void onLoad() {
+
+    }
+
+    @Override
+    public void onEnable() {
+
+    }
+
+    @Override
+    public boolean isNaggable() {
+        return false;
+    }
+
+    @Override
+    public void setNaggable(boolean b) {
+
+    }
+
+    @Nullable
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(@NotNull String s, @Nullable String s1) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public BiomeProvider getDefaultBiomeProvider(@NotNull String s, @Nullable String s1) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public Logger getLogger() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        return null;
+    }
 }

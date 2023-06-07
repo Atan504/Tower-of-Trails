@@ -1,6 +1,7 @@
 package ToT.Objects;
 
 import ToT.Quests.QuestManger;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
@@ -11,14 +12,21 @@ public class TPlayer extends TEntity implements Serializable {
     ItemStack[] armors;
     ItemStack weapon;
     int[] stats;
+    int[] points;
+    String[] skills;
 
-    private QuestManger qm;
+    Player[] party;
+
+    private final QuestManger qm;
     public TPlayer(UUID uuid) {
         super(uuid);
         qm = new QuestManger(uuid);
-        this.armors = new ItemStack[4];
+        this.party = new Player[4]; // currectly max party is 4 players;
+        this.armors = new ItemStack[4];     // helmet, chestplate, leggings, boots
         this.weapon = null;
-        this.stats = new int[6];
+        this.stats = new int[8];            // mana, max_mana, str, hp, max_hp, def, magic, speed
+        this.points = new int[7];           // points, mana, str, hp, def, magic, speed
+        this.skills = new String[5];        // slot#3, slot#4, slot#5, slot#6, slot#6
     }
 
     public QuestManger getQm() {
@@ -37,11 +45,33 @@ public class TPlayer extends TEntity implements Serializable {
         this.weapon = weapon;
     }
 
-    public int[] getStats() {
-        return stats;
-    }
+    public int[] getStats() { return stats; }
 
     public void setStats(int[] stats) {
         this.stats = stats;
+    }
+
+    public String[] getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String[] skills) {
+        this.skills = skills;
+    }
+
+    public int[] getPoints() {
+        return points;
+    }
+
+    public void setPoints(int[] points) {
+        this.points = points;
+    }
+
+    public Player[] getParty() {
+        return party;
+    }
+
+    public void setParty(Player[] party) {
+        this.party = party;
     }
 }

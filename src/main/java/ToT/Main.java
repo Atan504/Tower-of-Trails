@@ -11,6 +11,7 @@ import ToT.Data.SpigotData;
 import ToT.Events.ChatEvent;
 import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
+import ToT.PartyManagment.Commands.PartyCommand;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -18,7 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
+import java.util.*;
 
 public final class Main extends JavaPlugin {
 
@@ -45,6 +46,58 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerChat(), this);
         getServer().getPluginManager().registerEvents(new SkillSelector(), this);
         getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
+        getServer().getPluginManager().registerEvents(new DisplayItem(), this);
+
+        Objects.requireNonNull(this.getCommand("party")).setExecutor(new PartyCommand());
+        Objects.requireNonNull(this.getCommand("party")).setTabCompleter((commandSender, command, s, args) -> {
+            List<String> l = new ArrayList<>();
+
+            if (args.length == 1) {
+                l.add("create");
+                l.add("invite");
+                l.add("kick");
+                l.add("leave");
+                l.add("disband");
+                l.add("promote");
+                l.add("join");
+                l.add("gui");
+                l.add("info");
+
+                return l;
+            }
+
+            if (args.length == 2) {
+                if (args[0].equals("invite") || args[0].equals("promote") || args[0].equals("join")) {
+                    List<String> playerNames = new ArrayList<>();
+                    Player[] players = new Player[Bukkit.getOnlinePlayers().size()];
+                    Bukkit.getOnlinePlayers().toArray(players);
+                    for (Player player : players) {
+                        playerNames.add(player.getName());
+                    }
+
+                    return playerNames;
+                }
+
+                if (args[0].equals("kick")) {
+                    List<String> playerNames = new ArrayList<>();
+                    Utils.TotalPlayers players = new Utils.TotalPlayers();
+
+                    for(UUID uuid : players.getUUIDList()) {
+                        Player player = Bukkit.getPlayer(uuid);
+                        if(player == null) {
+                            playerNames.add(Bukkit.getOfflinePlayer(uuid).getName());
+                        } else {
+                            playerNames.add(player.getName());
+                        }
+                    }
+
+                    return playerNames;
+                }
+            }
+
+
+            return null;
+        });
 
         Tasks.updateStats();
         YamlConfigLoader.createAllConfig();

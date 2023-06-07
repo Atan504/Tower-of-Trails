@@ -22,3 +22,6 @@ commands:
   jreload:
     description: jreload.
     usage: /<command>
+  party:
+    description: party
+    usage: /<command>

@@ -1,6 +1,8 @@
 package ToT.Listener;
 
 import ToT.CustomMenu;
+import ToT.Data.SpigotData;
+import ToT.Objects.TPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,6 +22,9 @@ public class ProfileMenu implements Listener {
 
         Player player = (Player) event.getWhoClicked();
 
+        SpigotData.getInstance().enterEntity(player.getUniqueId());
+        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
+
         if(!(Objects.requireNonNull(event.getClickedInventory()).getType().equals(InventoryType.CHEST) && Objects.equals(event.getClickedInventory().getHolder(), player))) return;
 
         event.setCancelled(true);
@@ -33,12 +38,12 @@ public class ProfileMenu implements Listener {
         if(ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName()).contains("Skill Points")) {
             if (event.isShiftClick()) {
                 if (event.isLeftClick() || event.isRightClick()) {
-                    CustomMenu.update_values(player, event.getClickedInventory(), "mana", -player.getMetadata("skills.point.mana").get(0).asInt());
-                    CustomMenu.update_values(player, event.getClickedInventory(), "str", -player.getMetadata("skills.point.str").get(0).asInt());
-                    CustomMenu.update_values(player, event.getClickedInventory(), "hp", -player.getMetadata("skills.point.hp").get(0).asInt());
-                    CustomMenu.update_values(player, event.getClickedInventory(), "def", -player.getMetadata("skills.point.def").get(0).asInt());
-                    CustomMenu.update_values(player, event.getClickedInventory(), "speed", -player.getMetadata("skills.point.speed").get(0).asInt());
-                    CustomMenu.update_values(player, event.getClickedInventory(), "magic", -player.getMetadata("skills.point.magic").get(0).asInt());
+                    CustomMenu.update_values(player, event.getClickedInventory(), "mana", -TP.getStats()[1]);
+                    CustomMenu.update_values(player, event.getClickedInventory(), "str", -TP.getStats()[2]);
+                    CustomMenu.update_values(player, event.getClickedInventory(), "hp", -TP.getStats()[4]);
+                    CustomMenu.update_values(player, event.getClickedInventory(), "def", -TP.getStats()[5]);
+                    CustomMenu.update_values(player, event.getClickedInventory(), "speed", -TP.getStats()[6]);
+                    CustomMenu.update_values(player, event.getClickedInventory(), "magic", -TP.getStats()[7]);
                 }
             }
         }
