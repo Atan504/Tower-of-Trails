@@ -1,20 +1,32 @@
 package ToT.PartyManagment.Commands;
 
 import ToT.Objects.TPlayer;
+import ToT.Utils.DisplayItem;
 import ToT.Utils.PartyManagment;
+import ToT.Utils.TextComponentUtil;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.List;
 
 import static ToT.Main.plugin;
 
@@ -91,8 +103,6 @@ public class PartyCommand implements CommandExecutor {
                 data.setParty(party);
             }
 
-            TPlayer data = PartyManagment.getData(PartyManagment.getOwner(party));
-
             if(!PartyManagment.isOwner(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
@@ -110,7 +120,23 @@ public class PartyCommand implements CommandExecutor {
 
             player.sendMessage(ChatColor.YELLOW + "You Sent Party Invitation to " + member.getName());
 
-            member.sendMessage(ChatColor.YELLOW + player.getName() + " Invited you to the Party, Join the party via /party join " + player.getName());
+            // member.sendMessage(ChatColor.YELLOW + player.getName() + " Invited you to the Party, Join the party via /party join " + player.getName());
+
+            String message = ChatColor.YELLOW + player.getName() + " Invited you to the Party, click to join ";
+
+            TextComponent clickComponent = new TextComponent("[JOIN]");
+            clickComponent.setColor(ChatColor.GREEN);
+            clickComponent.setBold(true);
+            clickComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party join " + player.getName()));
+
+            TextComponent hoverComponent = new TextComponent("Click to join the party");
+            hoverComponent.setColor(ChatColor.YELLOW);
+            clickComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hoverComponent.toLegacyText())));
+
+            TextComponent messageComponent = new TextComponent(message);
+            messageComponent.addExtra(clickComponent);
+
+            member.spigot().sendMessage(messageComponent);
 
             member.setMetadata("party.invite.timer." + player.getUniqueId(), new FixedMetadataValue(plugin, new Date().getTime()));
         }
