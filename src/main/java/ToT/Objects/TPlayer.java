@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TPlayer extends TEntity implements Serializable {
@@ -15,13 +17,13 @@ public class TPlayer extends TEntity implements Serializable {
     int[] points;
     String[] skills;
 
-    Player[] party;
+    List<Player> party;
 
     private final QuestManger qm;
     public TPlayer(UUID uuid) {
         super(uuid);
         qm = new QuestManger(uuid);
-        this.party = new Player[4]; // currectly max party is 4 players;
+        this.party = new ArrayList<>(); // currently max party is 4 players;
         this.armors = new ItemStack[4];     // helmet, chestplate, leggings, boots
         this.weapon = null;
         this.stats = new int[8];            // mana, max_mana, str, hp, max_hp, def, magic, speed
@@ -67,11 +69,11 @@ public class TPlayer extends TEntity implements Serializable {
         this.points = points;
     }
 
-    public Player[] getParty() {
+    public List<Player> getParty() {
         return party;
     }
 
-    public void setParty(Player[] party) {
+    public void setParty(List<Player> party) {
         this.party = party;
     }
 }

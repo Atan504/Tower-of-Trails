@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class PartyChatCommand implements CommandExecutor {
 
     @Override
@@ -25,16 +27,16 @@ public class PartyChatCommand implements CommandExecutor {
             return true;
         }
 
-        Player[] party = PartyManagment.getParty(player);
-        Player[] members = PartyManagment.getMembers(party);
+        List<Player> party = PartyManagment.getParty(player);
+        List<Player> members = PartyManagment.getMembers(party);
 
-        for (Player member : members) {
+        members.forEach(p -> {
             if(PartyManagment.isOwner(party, player)) {
-                member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
+                p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
             } else {
-                member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
+                p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
             }
-        }
+        });
 
         return true;
     }

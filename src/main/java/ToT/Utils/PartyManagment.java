@@ -6,7 +6,10 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public class PartyManagment {
 
@@ -16,72 +19,35 @@ public class PartyManagment {
         return ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId()));
     }
 
-    public static Player[] getParty(Player player) {
-        Player[] party = new Player[4];
+    public static List<Player> getParty(Player player) {
 
-        for(Player p : Bukkit.getServer().getOnlinePlayers()) {
-            TPlayer data = getData(p);
+        if(Bukkit.getServer().getOnlinePlayers().stream().filter(p -> getData(p).getParty().contains(player)).toList().size() == 0) return new ArrayList<>();
 
-            if(Arrays.stream(data.getParty()).toList().contains(player)) {
-                party = data.getParty();
-                break;
-            }
-        }
+        Player owner = Bukkit.getServer().getOnlinePlayers().stream().filter(p -> getData(p).getParty().contains(player)).toList().get(0);
+        TPlayer data = getData(owner);
 
-        return party;
+        return new ArrayList<>(data.getParty());
     }
 
-    public static Boolean inParty(Player[] party, Player member) {
-
-        for(Player p : party) {
-            if (p != null && p.equals(member)) {
-                return true;
-            }
-        }
-        return false;
+    public static Boolean inParty(List<Player> party, Player member) {
+        return party.contains(member);
     }
 
-    public static Boolean isOwner(Player[] party, Player member) {
+    public static Boolean isOwner(List<Player> party, Player member) {
         return getOwner(party) == member;
     }
 
-    public static Player getOwner(Player[] party) {
-        return party[0];
+    public static Player getOwner(List<Player> party) {
+        return party.get(0);
     }
 
-    public static Player[] getMembers(Player[] party) {
-
-        int count = 0;
-        for (Player player : party) {
-            if (player != null) {
-                count++;
-            }
-        }
-
-        Player[] members = new Player[count];
-
-        int i = 0;
-        for (Player player : party) {
-            if (player != null) {
-                members[i] = player;
-                i++;
-            }
-        }
-
-        return members;
+    public static List<Player> getMembers(List<Player> party) {
+        return party.stream().filter(Objects::nonNull).toList();
     }
 
-    public static Player getPlayer(Player player, String username) {
-
-        Player member = Bukkit.getServer().getPlayer(username);
-
-        if(member == null) {
-            player.sendMessage(ChatColor.RED + username + " Player not found");
-            return null;
-        }
-
-        return member;
-
+    public static Player getPlayer(List<Player> members, String username) {
+        if(members.stream().filter(p -> p.getName().equals(username)).toList().size() == 0) return null;
+        return members.stream().filter(p -> p.getName().equals(username)).toList().get(0);
     }
 
 }

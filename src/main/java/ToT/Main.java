@@ -14,7 +14,7 @@ import ToT.Listener.*;
 import ToT.PartyManagment.Commands.PartyChatCommand;
 import ToT.PartyManagment.Commands.PartyCommand;
 import ToT.Utils.Config;
-import ToT.Utils.Utils;
+import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -72,31 +72,14 @@ public final class Main extends JavaPlugin {
             }
 
             if (args.length == 2) {
-                if (args[0].equals("invite") || args[0].equals("promote") || args[0].equals("join")) {
-                    List<String> playerNames = new ArrayList<>();
-                    Player[] players = new Player[Bukkit.getOnlinePlayers().size()];
-                    Bukkit.getOnlinePlayers().toArray(players);
-                    for (Player player : players) {
-                        playerNames.add(player.getName());
-                    }
-
-                    return playerNames;
+                if(args[0].equals("invite") || args[0].equals("join")) {
+                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
                 }
+                if (args[0].equals("promote") || args[0].equals("kick")) {
+                    List<Player> party = PartyManagment.getParty((Player) commandSender);
+                    List<Player> members = PartyManagment.getMembers(party);
 
-                if (args[0].equals("kick")) {
-                    List<String> playerNames = new ArrayList<>();
-                    Utils.TotalPlayers players = new Utils.TotalPlayers();
-
-                    for(UUID uuid : players.getUUIDList()) {
-                        Player player = Bukkit.getPlayer(uuid);
-                        if(player == null) {
-                            playerNames.add(Bukkit.getOfflinePlayer(uuid).getName());
-                        } else {
-                            playerNames.add(player.getName());
-                        }
-                    }
-
-                    return playerNames;
+                    return members.stream().map(Player::getName).toList();
                 }
             }
 
