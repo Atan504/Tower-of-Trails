@@ -11,6 +11,7 @@ import ToT.Data.SpigotData;
 import ToT.Events.ChatEvent;
 import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
+import ToT.PartyManagment.Commands.PartyChatCommand;
 import ToT.PartyManagment.Commands.PartyCommand;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -48,12 +49,14 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
         getServer().getPluginManager().registerEvents(new DisplayItem(), this);
 
+        Objects.requireNonNull(this.getCommand("p")).setExecutor(new PartyChatCommand());
         Objects.requireNonNull(this.getCommand("party")).setExecutor(new PartyCommand());
         Objects.requireNonNull(this.getCommand("party")).setTabCompleter((commandSender, command, s, args) -> {
             List<String> l = new ArrayList<>();
 
             if (args.length == 1) {
                 l.add("create");
+                l.add("chat");
                 l.add("invite");
                 l.add("kick");
                 l.add("leave");

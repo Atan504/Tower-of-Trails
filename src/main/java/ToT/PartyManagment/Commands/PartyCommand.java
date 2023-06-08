@@ -47,6 +47,32 @@ public class PartyCommand implements CommandExecutor {
             return true;
         }
 
+        if (tab.equalsIgnoreCase("chat")) {
+
+            if(!inParty(getParty(player), player)) {
+                player.sendMessage(ChatColor.RED + "You are not in Party");
+                return true;
+            }
+
+            List<MetadataValue> active = player.getMetadata("party.chat.toggle");
+
+            if(active.isEmpty()) {
+                player.sendMessage(ChatColor.YELLOW + "You toggled Party Chat " + ChatColor.GREEN + ChatColor.BOLD + "ON");
+                player.setMetadata("party.chat.toggle", new FixedMetadataValue(plugin, true));
+            } else {
+                if(active.get(0).asBoolean()) {
+                    player.sendMessage(ChatColor.YELLOW + "You toggled Party Chat " + ChatColor.RED + ChatColor.BOLD + "OFF");
+                    player.setMetadata("party.chat.toggle", new FixedMetadataValue(plugin, false));
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You toggled Party Chat " + ChatColor.GREEN + ChatColor.BOLD + "ON");
+                    player.setMetadata("party.chat.toggle", new FixedMetadataValue(plugin, true));
+                }
+            }
+
+
+            return true;
+        }
+
         if(tab.equalsIgnoreCase("invite")) {
 
             if(args.length == 1) {
@@ -186,6 +212,7 @@ public class PartyCommand implements CommandExecutor {
                                 party[1] = null;
                             }
 
+                            assert party[0] != null;
                             party[0].sendMessage(ChatColor.YELLOW + "Previous Party Owner left the Party you become the new Party Owner");
                             player.sendMessage(ChatColor.RED + "You Left the party!");
                         } else {
@@ -334,7 +361,9 @@ public class PartyCommand implements CommandExecutor {
             return true;
         }
 
-        if(tab.equalsIgnoreCase("gui")) {}
+        if(tab.equalsIgnoreCase("gui")) {
+            return true;
+        }
 
         if (tab.equalsIgnoreCase("info")) {
 
@@ -375,13 +404,13 @@ public class PartyCommand implements CommandExecutor {
         return true;
     }
 
-    public TPlayer getData(Player player) {
+    public static TPlayer getData(Player player) {
         SpigotData.getInstance().enterEntity(player.getUniqueId());
 
         return ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId()));
     }
 
-    public Player[] getParty(Player player) {
+    public static Player[] getParty(Player player) {
         Player[] party = new Player[4];
 
         for(Player p : Bukkit.getServer().getOnlinePlayers()) {
@@ -396,7 +425,7 @@ public class PartyCommand implements CommandExecutor {
         return party;
     }
 
-    public Boolean inParty(Player[] party, Player member) {
+    public static Boolean inParty(Player[] party, Player member) {
 
         for(Player p : party) {
             if (p != null && p.equals(member)) {
@@ -406,15 +435,15 @@ public class PartyCommand implements CommandExecutor {
         return false;
     }
 
-    public Boolean isOwner(Player[] party, Player member) {
+    public static Boolean isOwner(Player[] party, Player member) {
         return getOwner(party) == member;
     }
 
-    public Player getOwner(Player[] party) {
+    public static Player getOwner(Player[] party) {
         return party[0];
     }
 
-    public Player[] getMembers(Player[] party) {
+    public static Player[] getMembers(Player[] party) {
 
         int count = 0;
         for (Player player : party) {

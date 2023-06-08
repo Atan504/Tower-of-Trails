@@ -25,3 +25,6 @@ commands:
   party:
     description: party
     usage: /<command>
+  p:
+    description: send message to party
+    usage: /<command> <message>

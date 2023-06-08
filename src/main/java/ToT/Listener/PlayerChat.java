@@ -3,6 +3,7 @@ package ToT.Listener;
 import ToT.CustomMenu;
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.PartyManagment.Commands.PartyCommand;
 import ToT.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -20,6 +21,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
@@ -188,9 +190,7 @@ public class PlayerChat implements Listener, Plugin {
                 player.getInventory().addItem(item);
             }
             player.sendMessage(args[1] + "  equipments Loaded!");
-        }
-
-        if (message.toLowerCase().startsWith("armor")) {
+        } else if (message.toLowerCase().startsWith("armor")) {
             event.setCancelled(true);
 
             String[] args = event.getMessage().toLowerCase().split(" ");
@@ -206,21 +206,15 @@ public class PlayerChat implements Listener, Plugin {
                 player.getInventory().addItem(item);
             }
             player.sendMessage("You got the " + args[1] + " armor!");
-        }
-
-        if (message.equals("menu")) {
+        } else if (message.equals("menu")) {
             event.setCancelled(true);
 
             CustomMenu.openInventory(player, CustomMenu.getInventory(player, "skills_selector", 0));
-        }
-
-        if (message.equals("menu2")) {
+        } else if (message.equals("menu2")) {
             event.setCancelled(true);
 
             CustomMenu.openInventory(player, CustomMenu.getInventory(player, "profile_menu", 0));
-        }
-
-        if(message.equals("stats")) {
+        } else if(message.equals("stats")) {
             event.setCancelled(true);
             int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
 
@@ -234,9 +228,7 @@ public class PlayerChat implements Listener, Plugin {
             player.sendMessage("Speed: " + stats[6]);
             player.sendMessage("Magic: " + stats[7]);
 
-        }
-
-        if(message.equals("reset")) {
+        } else if(message.equals("reset")) {
             event.setCancelled(true);
             int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
 
@@ -252,92 +244,19 @@ public class PlayerChat implements Listener, Plugin {
             player.sendMessage("Speed: " + stats[6]);
             player.sendMessage("Magic: " + stats[7]);
 
-        }
-
-        if(message.equals("FABULUS")) {
+        } else if(message.equals("FABULUS")) {
             event.setCancelled(true);
 
             TP.getPoints()[0] = 500;
 
             player.sendMessage("YOU ARE THE TRUE FABULUS GOD!!!!!");
-        }
-
-        if(message.equals("FABULOUS")) {
+        } else if(message.equals("FABULOUS")) {
             event.setCancelled(true);
 
             TP.getPoints()[0] = 2;
 
             player.sendMessage("YOU ARE NOT REAL FABULUS!!!!");
-        }
-
-        if(message.contains("[item]")) {
-
-            /*Player sender = event.getPlayer();
-
-            // Run the task asynchronously to access the main hand item
-            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-                ItemStack item = getItemInMainHand(sender);
-                String displayName = getItemDisplayName(item);
-
-                // Replace [item] with [item_in_main_hand_display_name]
-                message[0] = message[0].replace("[item]", "[" + displayName + "]");
-
-                // Send the modified message to all online players
-                Bukkit.getScheduler().runTask(this, () -> {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        sendHoverText(player, sender.getName(), message[0], item);
-                    }
-                });
-            });*/
-
-            /*String new_message = "<" + player.getDisplayName() + "> " + message;
-
-            String[] parts = new_message.split("\\[item\\]", -1);
-
-            BaseComponent[] messageComponents = new BaseComponent[0];
-
-            for (String part : parts) {
-                TextComponent textComponent = new TextComponent(part);
-
-                ItemStack item = player.getInventory().getItemInMainHand();
-
-                if (item.getType() != Material.AIR) {
-                    ItemMeta itemMeta = item.getItemMeta();
-                    if (itemMeta != null && itemMeta.hasDisplayName()) {*/
-                        /*
-                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
-                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
-                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
-
-                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
-                         */
-
-                        /*TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
-                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
-                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().toString(),
-                                item.getAmount(), ItemTag.ofNbt(ItemStackReflection.getNBT(item)))));
-
-                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
-                    } else {
-                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + item.getType() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
-                        BaseComponent[] hoverTextComponents = getItemHoverTextComponents(item);
-                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
-
-                        if(messageComponents.length != 0) messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
-                    }
-                }
-
-                messageComponents = TextComponentUtil.append(messageComponents, textComponent);
-            }*/
-
-            /*for(Player p : plugin.getServer().getOnlinePlayers()) {
-                p.spigot().sendMessage(ChatMessageType.CHAT, test);
-            }*/
-
-            event.setCancelled(true);
-        }
-
-        if(message.equals("wynncraft")) {
+        } else if(message.equals("wynncraft")) {
 
             event.setCancelled(true);
 
@@ -380,7 +299,25 @@ public class PlayerChat implements Listener, Plugin {
 
 // You can then use the ItemStack as needed, for example, give it to a player:
             player.getInventory().addItem(diamondSword);
-        }
+        } else {
+            List<MetadataValue> active = player.getMetadata("party.chat.toggle");
+
+            if(!active.isEmpty()) {
+                if(active.get(0).asBoolean()) {
+                    event.setCancelled(true);
+                    Player[] party = PartyCommand.getParty(player);
+                    Player[] members = PartyCommand.getMembers(party);
+
+                    for (Player member : members) {
+                        if(PartyCommand.isOwner(party, player)) {
+                            member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
+                        } else {
+                            member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
+                        }
+                    }
+                }
+                }
+            }
 
     }
 
