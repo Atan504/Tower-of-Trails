@@ -2,46 +2,15 @@ package ToT;
 
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.Utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
-
 import static ToT.Main.plugin;
 
 public class Tasks {
-
-    public static String getSet(ItemStack item) {
-        if(item == null) return "";
-        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName()), "");
-
-        return config.getString("set");
-    }
-
-    public static int[] getItemStats(ItemStack item) {
-
-        if(item == null) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-        if(!item.hasItemMeta()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-        if(!Objects.requireNonNull(item.getItemMeta()).hasDisplayName()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "stats");
-
-        if(config == null) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        int mana,str,hp,def,speed,magic;
-
-        mana = config.getInt("Mana");
-        str = config.getInt("Strength");
-        hp = config.getInt("Health");
-        def = config.getInt("Defense");
-        speed = config.getInt("Speed");
-        magic = config.getInt("Magic");
-
-        return new int[]{ 0, mana, str, 0, hp, def, speed, magic };
-    }
 
     public static void updateStats() {
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
@@ -59,16 +28,16 @@ public class Tasks {
 
                 if(!Utils.ArmorType(weapon).equals("NONE")) weapon = null;
 
-                int[] helmetStats = getItemStats(helmet);
-                int[] chestplateStats = getItemStats(chestplate);
-                int[] leggingsStats = getItemStats(leggings);
-                int[] bootsStats = getItemStats(boots);
-                int[] weaponStats = getItemStats(weapon);
+                int[] helmetStats = Utils.getItemStats(helmet);
+                int[] chestplateStats = Utils.getItemStats(chestplate);
+                int[] leggingsStats = Utils.getItemStats(leggings);
+                int[] bootsStats = Utils.getItemStats(boots);
+                int[] weaponStats = Utils.getItemStats(weapon);
 
                 int[] setBonus = new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
 
-                if (getSet(helmet).equals(getSet(chestplate)) && getSet(chestplate).equals(getSet(leggings)) && getSet(leggings).equals(getSet(boots))) {
-                            ConfigurationSection stats = Utils.getConfig("sets", getSet(helmet), "stats");
+                if (Utils.getSet(helmet).equals(Utils.getSet(chestplate)) && Utils.getSet(chestplate).equals(Utils.getSet(leggings)) && Utils.getSet(leggings).equals(Utils.getSet(boots))) {
+                            ConfigurationSection stats = Utils.getConfig("sets", Utils.getSet(helmet), "stats");
 
                             setBonus[1] = stats.getInt("Mana");
                             setBonus[2] = stats.getInt("Strength");

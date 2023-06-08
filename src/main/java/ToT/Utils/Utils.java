@@ -1,4 +1,4 @@
-package ToT;
+package ToT.Utils;
 
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
@@ -795,6 +795,76 @@ public class Utils {
         }
 
         return item;
+    }
+
+    public static String toProperCase(String str) {
+        StringBuilder properCase = new StringBuilder();
+
+        boolean capitalizeNext = true;
+        for (char c : str.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                c = Character.toTitleCase(c);
+                capitalizeNext = false;
+            }
+            properCase.append(c);
+        }
+
+        return properCase.toString();
+    }
+
+    public static String intToRoman(int num) {
+        String[] romanSymbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+
+        StringBuilder romanNumeral = new StringBuilder();
+        int index = 0;
+
+        while (num > 0) {
+            if (num >= values[index]) {
+                romanNumeral.append(romanSymbols[index]);
+                num -= values[index];
+            } else {
+                index++;
+            }
+        }
+
+        return romanNumeral.toString();
+    }
+
+    public static int generateRandomInteger(int min, int max) {
+        Random random = new Random();
+        return random.nextInt((max - min) + 1) + min;
+    }
+
+    public static String getSet(ItemStack item) {
+        if(item == null) return "";
+        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName()), "");
+
+        return config.getString("set");
+    }
+
+    public static int[] getItemStats(ItemStack item) {
+
+        if(item == null) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+        if(!item.hasItemMeta()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+        if(!Objects.requireNonNull(item.getItemMeta()).hasDisplayName()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "stats");
+
+        if(config == null) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        int mana,str,hp,def,speed,magic;
+
+        mana = config.getInt("Mana");
+        str = config.getInt("Strength");
+        hp = config.getInt("Health");
+        def = config.getInt("Defense");
+        speed = config.getInt("Speed");
+        magic = config.getInt("Magic");
+
+        return new int[]{ 0, mana, str, 0, hp, def, speed, magic };
     }
 
 }

@@ -13,6 +13,8 @@ import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
 import ToT.PartyManagment.Commands.PartyChatCommand;
 import ToT.PartyManagment.Commands.PartyCommand;
+import ToT.Utils.Config;
+import ToT.Utils.Utils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -47,7 +49,7 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerChat(), this);
         getServer().getPluginManager().registerEvents(new SkillSelector(), this);
         getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
-        getServer().getPluginManager().registerEvents(new DisplayItem(), this);
+        getServer().getPluginManager().registerEvents(new DisplayItemChat(), this);
 
         Objects.requireNonNull(this.getCommand("p")).setExecutor(new PartyChatCommand());
         Objects.requireNonNull(this.getCommand("party")).setExecutor(new PartyCommand());
@@ -103,7 +105,7 @@ public final class Main extends JavaPlugin {
         });
 
         Tasks.updateStats();
-        YamlConfigLoader.createAllConfig();
+        Config.createAllConfig();
 
 
 

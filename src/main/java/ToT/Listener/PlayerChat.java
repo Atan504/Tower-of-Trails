@@ -1,10 +1,10 @@
 package ToT.Listener;
 
-import ToT.CustomMenu;
+import ToT.Utils.CustomMenu;
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
-import ToT.PartyManagment.Commands.PartyCommand;
-import ToT.Utils;
+import ToT.Utils.PartyManagment;
+import ToT.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Material;
@@ -280,11 +280,11 @@ public class PlayerChat implements Listener, Plugin {
                     "",
                     ChatColor.GREEN + "+15" + ChatColor.GRAY + " Strength",
                     "",
-                    ChatColor.GREEN + "+" + generateRandomInteger(7, 30) + "%" + ChatColor.GRAY + " Main Attack Damage",
-                    ChatColor.GREEN + "+" + generateRandomInteger(7, 30) + "%" + ChatColor.GRAY + " Spell Damage",
-                    ChatColor.RED + String.valueOf(generateRandomInteger(-18, -10)) + "/5s" + ChatColor.GRAY + " Mana Regen",
-                    ChatColor.RED + String.valueOf(generateRandomInteger(-18, -10)) + "%" + ChatColor.GRAY + " Walk Speed",
-                    ChatColor.GREEN + "+" + generateRandomInteger(9, 40) + "%" + ChatColor.GRAY + " Fire Defence",
+                    ChatColor.GREEN + "+" + Utils.generateRandomInteger(7, 30) + "%" + ChatColor.GRAY + " Main Attack Damage",
+                    ChatColor.GREEN + "+" + Utils.generateRandomInteger(7, 30) + "%" + ChatColor.GRAY + " Spell Damage",
+                    ChatColor.RED + String.valueOf(Utils.generateRandomInteger(-18, -10)) + "/5s" + ChatColor.GRAY + " Mana Regen",
+                    ChatColor.RED + String.valueOf(Utils.generateRandomInteger(-18, -10)) + "%" + ChatColor.GRAY + " Walk Speed",
+                    ChatColor.GREEN + "+" + Utils.generateRandomInteger(9, 40) + "%" + ChatColor.GRAY + " Fire Defence",
                     "",
                     ChatColor.GRAY + "[0/2] Powder slots",
                     ChatColor.GREEN + "Set Item"
@@ -305,11 +305,11 @@ public class PlayerChat implements Listener, Plugin {
             if(!active.isEmpty()) {
                 if(active.get(0).asBoolean()) {
                     event.setCancelled(true);
-                    Player[] party = PartyCommand.getParty(player);
-                    Player[] members = PartyCommand.getMembers(party);
+                    Player[] party = PartyManagment.getParty(player);
+                    Player[] members = PartyManagment.getMembers(party);
 
                     for (Player member : members) {
-                        if(PartyCommand.isOwner(party, player)) {
+                        if(PartyManagment.isOwner(party, player)) {
                             member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
                         } else {
                             member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
@@ -319,11 +319,6 @@ public class PlayerChat implements Listener, Plugin {
                 }
             }
 
-    }
-
-    public static int generateRandomInteger(int min, int max) {
-        Random random = new Random();
-        return random.nextInt((max - min) + 1) + min;
     }
 
     @NotNull

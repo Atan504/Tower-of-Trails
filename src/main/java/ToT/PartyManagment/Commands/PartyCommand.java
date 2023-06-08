@@ -1,7 +1,7 @@
 package ToT.PartyManagment.Commands;
 
-import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -26,7 +26,7 @@ public class PartyCommand implements CommandExecutor {
 
         if (!(sender instanceof Player player)) return true;
 
-        TPlayer data = getData(player);
+        TPlayer data = PartyManagment.getData(player);
 
         if (args.length < 1) {
             player.sendMessage("Incorrect Syntax!");
@@ -37,7 +37,7 @@ public class PartyCommand implements CommandExecutor {
 
         if (tab.equalsIgnoreCase("create")) {
 
-            if(inParty(getParty(player), player)) {
+            if(PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You already inside a Party.");
                 return true;
             }
@@ -49,7 +49,7 @@ public class PartyCommand implements CommandExecutor {
 
         if (tab.equalsIgnoreCase("chat")) {
 
-            if(!inParty(getParty(player), player)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
@@ -80,31 +80,33 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            Player member = getPlayer(player, args[1]);
+            Player member = PartyManagment.getPlayer(player, args[1]);
 
-            if (!inParty(getParty(player), player)) {
+            if (!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.GREEN + "You Created new Party!");
                 data.getParty()[0] = player;
             }
 
-            Player[] party = getParty(player);
-            Player[] members = getMembers(party);
+            Player[] party = PartyManagment.getParty(player);
+            Player[] members = PartyManagment.getMembers(party);
 
             if (members.length == 4) {
                 player.sendMessage(ChatColor.RED + "Party is Full");
                 return true;
             }
 
-            if(!isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
 
-            if(inParty(getParty(player), member)) {
+            if(PartyManagment.inParty(PartyManagment.getParty(player), member)) {
+                assert member != null;
                 player.sendMessage(ChatColor.RED + "Player " + member.getName() + " already on the Party");
                 return true;
             }
 
+            assert member != null;
             player.sendMessage(ChatColor.YELLOW + "You Sent Party Invitation to " + member.getName());
 
             member.sendMessage(ChatColor.YELLOW + player.getName() + " Invited you to the Party, Join the party via /party join " + player.getName());
@@ -121,15 +123,15 @@ public class PartyCommand implements CommandExecutor {
 
             Player member = Bukkit.getServer().getPlayer(args[1]);
 
-            Player[] party = getParty(player);
-            Player[] members = getMembers(party);
+            Player[] party = PartyManagment.getParty(player);
+            Player[] members = PartyManagment.getMembers(party);
 
-            if (!inParty(party, player)) {
+            if (!PartyManagment.inParty(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            if(!isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
@@ -165,7 +167,7 @@ public class PartyCommand implements CommandExecutor {
                 }
             } else {
 
-                if (!inParty(getParty(player), member)) {
+                if (!PartyManagment.inParty(PartyManagment.getParty(player), member)) {
                     player.sendMessage(ChatColor.RED + "Player " + member.getName() + " not in the Party");
                     return true;
                 }
@@ -186,18 +188,18 @@ public class PartyCommand implements CommandExecutor {
 
         if(tab.equalsIgnoreCase("leave")) {
 
-            if(!inParty(getParty(player), player)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            Player[] party = getParty(player);
-            Player[] members = getMembers(party);
+            Player[] party = PartyManagment.getParty(player);
+            Player[] members = PartyManagment.getMembers(party);
 
             if(members.length > 1) {
                 for (int i = 0; i < party.length; i++) {
                     if (party[i] == player) {
-                        if(isOwner(party, player)) {
+                        if(PartyManagment.isOwner(party, player)) {
                             if(members.length == 4) {
                                 if (party[1] != null) party[0] = party[1];
                                 if (party[2] != null) party[1] = party[2];
@@ -216,7 +218,7 @@ public class PartyCommand implements CommandExecutor {
                             party[0].sendMessage(ChatColor.YELLOW + "Previous Party Owner left the Party you become the new Party Owner");
                             player.sendMessage(ChatColor.RED + "You Left the party!");
                         } else {
-                            TPlayer data2 = getData(getOwner(party));
+                            TPlayer data2 = PartyManagment.getData(PartyManagment.getOwner(party));
                             data2.getParty()[i] = null;
                             player.sendMessage(ChatColor.RED + "You Left the party!");
                         }
@@ -234,15 +236,15 @@ public class PartyCommand implements CommandExecutor {
 
         if(tab.equalsIgnoreCase("disband")) {
 
-            if(!inParty(getParty(player), player)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            Player[] party = getParty(player);
-            Player[] members = getMembers(party);
+            Player[] party = PartyManagment.getParty(player);
+            Player[] members = PartyManagment.getMembers(party);
 
-            if(!isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
@@ -262,21 +264,21 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(!inParty(getParty(player), player)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are not inside a Party");
                 return true;
             }
 
-            Player[] party = getParty(player);
+            Player[] party = PartyManagment.getParty(player);
 
-            if(!isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player)) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
 
             Player member = Bukkit.getServer().getPlayer(args[1]);
 
-            if(isOwner(party, member)) {
+            if(PartyManagment.isOwner(party, member)) {
                 assert member != null;
                 player.sendMessage(ChatColor.RED + member.getName() + " is already the Party Owner");
                 return true;
@@ -303,7 +305,7 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(inParty(getParty(player), player)) {
+            if(PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are already in a Party, leave this one first");
                 return true;
             }
@@ -317,12 +319,12 @@ public class PartyCommand implements CommandExecutor {
 
             System.out.println(owner);
 
-            if(!inParty(getParty(owner), owner)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(owner), owner)) {
                 player.sendMessage(ChatColor.RED + owner.getName() + " is not inside a Party");
                 return true;
             }
 
-            Player[] party = getParty(owner);
+            Player[] party = PartyManagment.getParty(owner);
 
             List<MetadataValue> timerData = player.getMetadata("party.invite.timer." + owner.getUniqueId());
 
@@ -367,20 +369,20 @@ public class PartyCommand implements CommandExecutor {
 
         if (tab.equalsIgnoreCase("info")) {
 
-            if(!inParty(getParty(player), player)) {
+            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
                 player.sendMessage(ChatColor.RED + "You are not inside a Party");
                 return true;
             }
 
-            Player[] party = getParty(player);
-            Player[] members = getMembers(party);
+            Player[] party = PartyManagment.getParty(player);
+            Player[] members = PartyManagment.getMembers(party);
 
             if(members.length != 0) {
                 player.sendMessage(ChatColor.AQUA + "Here your Party Information:");
 
                 for (var i = 0; i < party.length; i++) {
-                    if (isOwner(party, party[i])) {
-                        TPlayer data2 = getData(members[i]);
+                    if (PartyManagment.isOwner(party, party[i])) {
+                        TPlayer data2 = PartyManagment.getData(members[i]);
 
                         player.sendMessage(ChatColor.GOLD + members[i].getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
                     } else {
@@ -388,7 +390,7 @@ public class PartyCommand implements CommandExecutor {
                             player.sendMessage(ChatColor.GRAY + "- Empty");
                         } else {
                             if(members[i].isOnline()) {
-                                TPlayer data2 = getData(members[i]);
+                                TPlayer data2 = PartyManagment.getData(members[i]);
 
                                 player.sendMessage(ChatColor.YELLOW + members[i].getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
                             } else {
@@ -402,80 +404,6 @@ public class PartyCommand implements CommandExecutor {
         }
 
         return true;
-    }
-
-    public static TPlayer getData(Player player) {
-        SpigotData.getInstance().enterEntity(player.getUniqueId());
-
-        return ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId()));
-    }
-
-    public static Player[] getParty(Player player) {
-        Player[] party = new Player[4];
-
-        for(Player p : Bukkit.getServer().getOnlinePlayers()) {
-            TPlayer data = getData(p);
-
-            if(Arrays.stream(data.getParty()).toList().contains(player)) {
-                party = data.getParty();
-                break;
-            }
-        }
-
-        return party;
-    }
-
-    public static Boolean inParty(Player[] party, Player member) {
-
-        for(Player p : party) {
-            if (p != null && p.equals(member)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Boolean isOwner(Player[] party, Player member) {
-        return getOwner(party) == member;
-    }
-
-    public static Player getOwner(Player[] party) {
-        return party[0];
-    }
-
-    public static Player[] getMembers(Player[] party) {
-
-        int count = 0;
-        for (Player player : party) {
-            if (player != null) {
-                count++;
-            }
-        }
-
-        Player[] members = new Player[count];
-
-        int i = 0;
-        for (Player player : party) {
-            if (player != null) {
-                members[i] = player;
-                i++;
-            }
-        }
-
-        return members;
-    }
-
-    public Player getPlayer(Player player, String username) {
-
-        Player member = Bukkit.getServer().getPlayer(username);
-
-        if(member == null) {
-            player.sendMessage(ChatColor.RED + username + " Player not found");
-            return null;
-        }
-
-        return member;
-
     }
 
 }

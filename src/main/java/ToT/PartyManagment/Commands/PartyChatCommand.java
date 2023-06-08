@@ -1,5 +1,6 @@
 package ToT.PartyManagment.Commands;
 
+import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,16 +20,16 @@ public class PartyChatCommand implements CommandExecutor {
             return true;
         }
 
-        if(!PartyCommand.inParty(PartyCommand.getParty(player), player)) {
+        if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
             player.sendMessage(ChatColor.RED + "You are not in Party");
             return true;
         }
 
-        Player[] party = PartyCommand.getParty(player);
-        Player[] members = PartyCommand.getMembers(party);
+        Player[] party = PartyManagment.getParty(player);
+        Player[] members = PartyManagment.getMembers(party);
 
         for (Player member : members) {
-            if(PartyCommand.isOwner(party, player)) {
+            if(PartyManagment.isOwner(party, player)) {
                 member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
             } else {
                 member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));

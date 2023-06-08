@@ -1,6 +1,6 @@
 package ToT.Listener;
 
-import ToT.CustomMenu;
+import ToT.Utils.CustomMenu;
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
 import org.bukkit.ChatColor;

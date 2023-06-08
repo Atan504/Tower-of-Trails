@@ -1,4 +1,4 @@
-package ToT;
+package ToT.Utils;
 
 import ToT.ClassManagement.ClassList;
 import ToT.ClassManagement.Skill;
@@ -513,5 +513,4 @@ public class CustomMenu {
     public static void openInventory(Player player, Inventory inventory) {
         Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inventory));
     }
-
 }
