@@ -2,52 +2,77 @@ package ToT.Utils;
 
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Stream;
 
-public class PartyManagment {
+public class PartyManagment implements Serializable {
 
-    public static TPlayer getData(Player player) {
-        SpigotData.getInstance().enterEntity(player.getUniqueId());
+    public static TPlayer getData(UUID uuid) {
+        SpigotData.getInstance().enterEntity(uuid);
 
-        return ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId()));
+        return ((TPlayer) SpigotData.getInstance().getEntity(uuid));
     }
 
-    public static List<Player> getParty(Player player) {
+    public static List<UUID> getParty(UUID uuid) {
 
-        if(Bukkit.getServer().getOnlinePlayers().stream().filter(p -> getData(p).getParty().contains(player)).toList().size() == 0) return new ArrayList<>();
+        Stream<? extends Player> stream = Bukkit.getServer().getOnlinePlayers().stream().filter(p -> {
+            TPlayer data = getData(p.getUniqueId());
+            List<UUID> party = data.getParty();
 
-        Player owner = Bukkit.getServer().getOnlinePlayers().stream().filter(p -> getData(p).getParty().contains(player)).toList().get(0);
-        TPlayer data = getData(owner);
+            return party.contains(uuid);
+        });
+
+        List<? extends Player> list = stream.toList();
+
+        if(list.size() == 0) return new ArrayList<>();
+
+        Player owner = list.get(0);
+        TPlayer data = getData(owner.getUniqueId());
 
         return new ArrayList<>(data.getParty());
     }
 
-    public static Boolean inParty(List<Player> party, Player member) {
-        return party.contains(member);
+    public static Boolean inParty(List<UUID> party, UUID uuid) {
+        return party.contains(uuid);
     }
 
-    public static Boolean isOwner(List<Player> party, Player member) {
-        return getOwner(party) == member;
+    public static Boolean isOwner(List<UUID> party, UUID uuid) {
+        return getOwner(party).equals(uuid);
     }
 
-    public static Player getOwner(List<Player> party) {
-        return party.get(0);
+    public static UUID getOwner(List<UUID> party) {
+        Player player = Bukkit.getServer().getPlayer(party.get(0));
+        if(player == null) {
+            OfflinePlayer player2 = Bukkit.getServer().getOfflinePlayer(party.get(0));
+            return player2.getUniqueId();
+        } else {
+            return player.getUniqueId();
+        }
     }
 
-    public static List<Player> getMembers(List<Player> party) {
+    public static List<UUID> getMembers(List<UUID> party) {
         return party.stream().filter(Objects::nonNull).toList();
     }
 
-    public static Player getPlayer(List<Player> members, String username) {
-        if(members.stream().filter(p -> p.getName().equals(username)).toList().size() == 0) return null;
-        return members.stream().filter(p -> p.getName().equals(username)).toList().get(0);
+    public static UUID getPlayer(List<UUID> members, String username) {
+
+        Stream<UUID> stream = members.stream().filter(p -> {
+            Player p2 = Bukkit.getServer().getPlayer(p);
+            OfflinePlayer p3 = Bukkit.getServer().getOfflinePlayer(p);
+
+            if(p2 != null) return p2.getName().equals(username);
+            else return Objects.equals(p3.getName(), username);
+        });
+
+        List<UUID> list = stream.toList();
+
+        if(list.size() == 0) return null;
+        return list.get(0);
     }
 
 }

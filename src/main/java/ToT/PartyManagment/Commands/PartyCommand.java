@@ -1,28 +1,22 @@
 package ToT.PartyManagment.Commands;
 
 import ToT.Objects.TPlayer;
-import ToT.Utils.DisplayItem;
 import ToT.Utils.PartyManagment;
-import ToT.Utils.TextComponentUtil;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -46,23 +40,25 @@ public class PartyCommand implements CommandExecutor {
 
         if (tab.equalsIgnoreCase("create")) {
 
-            if(PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            if(PartyManagment.inParty(PartyManagment.getParty(player.getUniqueId()), player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You already inside a Party.");
                 return true;
             }
 
-            TPlayer data = PartyManagment.getData(player);
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
 
             player.sendMessage(ChatColor.GREEN + "You Created new Party!");
-            List<Player> party = data.getParty();
-            party.add(player);
+            List<UUID> party = data.getParty();
+            party.add(player.getUniqueId());
             data.setParty(party);
             return true;
         }
 
         if (tab.equalsIgnoreCase("chat")) {
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
@@ -94,16 +90,16 @@ public class PartyCommand implements CommandExecutor {
 
             Player member = Bukkit.getServer().getPlayer(args[1]);
 
-            List<Player> party = PartyManagment.getParty(player);
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
 
-            if (!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
-                TPlayer data = PartyManagment.getData(player);
+            if (!PartyManagment.inParty(party, player.getUniqueId())) {
+                TPlayer data = PartyManagment.getData(player.getUniqueId());
                 player.sendMessage(ChatColor.GREEN + "You Created new Party!");
-                party.add(player);
+                party.add(player.getUniqueId());
                 data.setParty(party);
             }
 
-            if(!PartyManagment.isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
@@ -113,7 +109,7 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(PartyManagment.inParty(PartyManagment.getParty(player), member)) {
+            if(PartyManagment.inParty(party, member.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "Player " + member.getName() + " already on the Party");
                 return true;
             }
@@ -148,100 +144,117 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(player);
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
 
-            if (!PartyManagment.inParty(party, player)) {
+            if (!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            TPlayer data = PartyManagment.getData(PartyManagment.getOwner(party));
+            UUID owner = PartyManagment.getOwner(party);
 
-            List<Player> members = PartyManagment.getMembers(party);
+            TPlayer data = PartyManagment.getData(owner);
 
-            Player member = PartyManagment.getPlayer(members, args[1]);
+            List<UUID> members = PartyManagment.getMembers(party);
 
-            if(!PartyManagment.isOwner(party, player)) {
+            UUID uuid = PartyManagment.getPlayer(members, args[1]);
+
+            if(!PartyManagment.isOwner(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
 
-            if(member == null) {
+            if(uuid == null) {
                 player.sendMessage(ChatColor.RED + args[1] + " Player not found");
                 return true;
             }
 
-            if(member == player) {
+            Player member = Bukkit.getServer().getPlayer(uuid);
+
+            if(uuid.equals(player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You cant kick yourself");
                 return true;
             }
 
-            party.remove(member);
+            party.remove(uuid);
             data.setParty(party);
-            player.sendMessage(ChatColor.RED + "You Kicked the Player " + member.getName() + " from the Party");
+            player.sendMessage(ChatColor.RED + "You Kicked the Player " + args[1] + " from the Party");
 
-            if(member.isOnline()) member.sendMessage(ChatColor.RED + "You got Kicked from the Party");
+            if(member != null) member.sendMessage(ChatColor.RED + "You got Kicked from the Party");
 
-            members.stream().filter(p -> p != member).forEach(p -> p.sendMessage(ChatColor.RED + member.getName() + " Left the party!"));
+            members.stream().filter(p -> p != uuid).forEach(p -> {
+                Player p2 = Bukkit.getServer().getPlayer(p);
+                if(p2 != null) p2.sendMessage(ChatColor.RED + args[1] + " Left the party!");
+            });
         }
 
         if(tab.equalsIgnoreCase("leave")) {
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(player);
-            List<Player> members = PartyManagment.getMembers(party);
+            List<UUID> members = PartyManagment.getMembers(party);
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
 
             if(members.size() == 1) {
-                TPlayer data = PartyManagment.getData(PartyManagment.getOwner(party));
 
                 player.sendMessage(ChatColor.RED + "You are the only one who left in the party");
                 player.sendMessage(ChatColor.RED + "Your Previous Party has been Disbanded");
-                party.remove(player);
+                party.remove(player.getUniqueId());
                 data.setParty(party);
                 return true;
             }
 
-            if(PartyManagment.isOwner(party, player)) party.get(1).sendMessage(ChatColor.YELLOW + "Previous Party Owner left the Party you become the new Party Owner");
+            if(PartyManagment.isOwner(party, player.getUniqueId())) {
+                Player p = Bukkit.getServer().getPlayer(party.get(1));
+                if(p != null) p.sendMessage(ChatColor.YELLOW + "Previous Party Owner left the Party you become the new Party Owner");
+            }
 
-            party.remove(player);
+            party.remove(player.getUniqueId());
             party = party.stream().filter(Objects::nonNull).toList();
 
-            TPlayer data = PartyManagment.getData(player);
-            TPlayer data2 = PartyManagment.getData(PartyManagment.getOwner(party));
+            UUID owner = PartyManagment.getOwner(party);
+
+            TPlayer data2 = PartyManagment.getData(owner);
 
             data.setParty(new ArrayList<>());
             data2.setParty(party);
 
             player.sendMessage(ChatColor.RED + "You Left the party!");
 
-            members.stream().filter(p -> p != player).forEach(p -> p.sendMessage(ChatColor.RED + player.getName() + " Left the party!"));
+            members.stream().filter(p -> p != player.getUniqueId()).forEach(p -> {
+                Player p2 = Bukkit.getServer().getPlayer(p);
+                if(p2 != null) p2.sendMessage(ChatColor.RED + player.getName() + " Left the party!");
+            });
             return true;
         }
 
         if(tab.equalsIgnoreCase("disband")) {
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not in Party");
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(player);
-            List<Player> members = PartyManagment.getMembers(party);
+            List<UUID> members = PartyManagment.getMembers(party);
 
-            TPlayer data = PartyManagment.getData(PartyManagment.getOwner(party));
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
 
-            if(!PartyManagment.isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
 
             members.forEach(p -> {
                 party.remove(p);
-                p.sendMessage(ChatColor.RED + "Your Previous Party has been Disbanded");
+                Player p2 = Bukkit.getServer().getPlayer(p);
+                if(p2 != null) p2.sendMessage(ChatColor.RED + "Your Previous Party has been Disbanded");
             });
 
             data.setParty(party);
@@ -256,41 +269,47 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not inside a Party");
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(player);
-
-            if(!PartyManagment.isOwner(party, player)) {
+            if(!PartyManagment.isOwner(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not the Party Owner");
                 return true;
             }
 
-            Player member = PartyManagment.getPlayer(party, args[1]);
+            UUID uuid = PartyManagment.getPlayer(party, args[1]);
 
-            if(member == null) {
+            if(uuid == null) {
                 player.sendMessage(ChatColor.RED + args[1] + " Player not found");
                 return true;
             }
 
-            if(PartyManagment.isOwner(party, member)) {
-                player.sendMessage(ChatColor.RED + member.getName() + " is already the Party Owner");
+            if(PartyManagment.isOwner(party, uuid)) {
+                player.sendMessage(ChatColor.RED + args[1] + " is already the Party Owner");
                 return true;
             }
 
-            party.set(party.indexOf(member), player);
-            party.set(0, member);
+            int index = party.indexOf(uuid);
 
-            TPlayer data = PartyManagment.getData(player);
-            TPlayer data2 = PartyManagment.getData(PartyManagment.getOwner(party));
+            party.set(index, player.getUniqueId());
+            party.set(0, uuid);
+
+            UUID owner = PartyManagment.getOwner(party);
+
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
+            TPlayer data2 = PartyManagment.getData(owner);
 
             data.setParty(new ArrayList<>());
             data2.setParty(party);
 
-            member.sendMessage(ChatColor.YELLOW + "You got Promoted to Party Owner");
-            player.sendMessage(ChatColor.YELLOW + "You transferred the Party Owner to " + member.getName());
+            Player member = Bukkit.getServer().getPlayer(uuid);
+
+            if(member != null) member.sendMessage(ChatColor.YELLOW + "You got Promoted to Party Owner");
+            player.sendMessage(ChatColor.YELLOW + "You transferred the Party Owner to " + args[1]);
         }
 
         if(tab.equalsIgnoreCase("join")) {
@@ -300,7 +319,9 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are already in a Party, leave this one first");
                 return true;
             }
@@ -312,13 +333,14 @@ public class PartyCommand implements CommandExecutor {
                 return true;
             }
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(owner), owner)) {
+            List<UUID> party2 = PartyManagment.getParty(owner.getUniqueId());
+
+            if(!PartyManagment.inParty(party2, owner.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + owner.getName() + " is not inside a Party");
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(owner);
-            List<Player> members = PartyManagment.getMembers(party);
+            List<UUID> members = PartyManagment.getMembers(party2);
 
             List<MetadataValue> timerData = player.getMetadata("party.invite.timer." + owner.getUniqueId());
 
@@ -340,12 +362,15 @@ public class PartyCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.RED + "there is no Party Invite Request");
             } else {
                 player.removeMetadata("party.invite.timer." + owner.getUniqueId(), plugin);
-                members.forEach(p -> p.sendMessage(ChatColor.YELLOW + player.getName() + " Joined the Party"));
+                members.forEach(p -> {
+                    Player p2 = Bukkit.getServer().getPlayer(p);
+                    if(p2 != null) p2.sendMessage(ChatColor.YELLOW + player.getName() + " Joined the Party");
+                });
 
-                TPlayer data2 = PartyManagment.getData(owner);
+                TPlayer data2 = PartyManagment.getData(owner.getUniqueId());
 
-                party.add(player);
-                data2.setParty(party);
+                party2.add(player.getUniqueId());
+                data2.setParty(party2);
 
                 player.sendMessage(ChatColor.YELLOW + "You Joined the Party of " + owner.getName());
             }
@@ -358,26 +383,30 @@ public class PartyCommand implements CommandExecutor {
 
         if (tab.equalsIgnoreCase("info")) {
 
-            if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+            List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+            if(!PartyManagment.inParty(party, player.getUniqueId())) {
                 player.sendMessage(ChatColor.RED + "You are not inside a Party");
                 return true;
             }
 
-            List<Player> party = PartyManagment.getParty(player);
-            List<Player> members = PartyManagment.getMembers(party);
+            List<UUID> members = PartyManagment.getMembers(party);
 
-                player.sendMessage(ChatColor.AQUA + "Here your Party Information:");
+            player.sendMessage(ChatColor.AQUA + "Here your Party Information:");
 
-                members.forEach(p -> {
-                    TPlayer data2 = PartyManagment.getData(p);
-                    if (PartyManagment.isOwner(party, p)) {
-                        player.sendMessage(ChatColor.GOLD + p.getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
-                    } else if(p.isOnline()) {
-                        player.sendMessage(ChatColor.YELLOW + p.getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
-                    } else {
-                        player.sendMessage(ChatColor.GRAY + p.getName());
-                    }
-                });
+            members.forEach(p -> {
+                TPlayer data2 = PartyManagment.getData(p);
+                Player p2 = Bukkit.getServer().getPlayer(p);
+                OfflinePlayer p3 = Bukkit.getServer().getOfflinePlayer(p);
+
+                if (PartyManagment.isOwner(party, p)) {
+                    if(p2 != null) player.sendMessage(ChatColor.GOLD + p2.getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
+                    else player.sendMessage(ChatColor.GRAY + p3.getName());
+                } else {
+                    if(p2 != null) player.sendMessage(ChatColor.YELLOW + p2.getName() + ChatColor.GRAY + " - " + ChatColor.RED + data2.getStats()[3] + "/" + data2.getStats()[4]);
+                    else player.sendMessage(ChatColor.GRAY + p3.getName());
+                }
+            });
 
             return true;
         }

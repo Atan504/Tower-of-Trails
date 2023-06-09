@@ -2,6 +2,7 @@ package ToT.PartyManagment.Commands;
 
 import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PartyChatCommand implements CommandExecutor {
 
@@ -22,19 +24,21 @@ public class PartyChatCommand implements CommandExecutor {
             return true;
         }
 
-        if(!PartyManagment.inParty(PartyManagment.getParty(player), player)) {
+        List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+
+        if(!PartyManagment.inParty(party, player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "You are not in Party");
             return true;
         }
 
-        List<Player> party = PartyManagment.getParty(player);
-        List<Player> members = PartyManagment.getMembers(party);
+        List<UUID> members = PartyManagment.getMembers(party);
 
         members.forEach(p -> {
-            if(PartyManagment.isOwner(party, player)) {
-                p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
+            Player p2 = Bukkit.getServer().getPlayer(p);
+            if(PartyManagment.isOwner(party, player.getUniqueId())) {
+                if(p2 != null) p2.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
             } else {
-                p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
+                if(p2 != null) p2.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + String.join(" ", args));
             }
         });
 

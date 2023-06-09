@@ -1,7 +1,6 @@
 package ToT.Objects;
 
 import ToT.Quests.QuestManger;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
@@ -11,19 +10,18 @@ import java.util.UUID;
 
 public class TPlayer extends TEntity implements Serializable {
 
-    ItemStack[] armors;
-    ItemStack weapon;
-    int[] stats;
-    int[] points;
-    String[] skills;
-
-    List<Player> party;
+    private final ItemStack[] armors;
+    private ItemStack weapon;
+    private int[] stats;
+    private int[] points;
+    private String[] skills;
+    private List<UUID> party;
 
     private final QuestManger qm;
     public TPlayer(UUID uuid) {
         super(uuid);
         qm = new QuestManger(uuid);
-        this.party = new ArrayList<>(); // currently max party is 4 players;
+        this.party = new ArrayList<>();
         this.armors = new ItemStack[4];     // helmet, chestplate, leggings, boots
         this.weapon = null;
         this.stats = new int[8];            // mana, max_mana, str, hp, max_hp, def, magic, speed
@@ -69,11 +67,11 @@ public class TPlayer extends TEntity implements Serializable {
         this.points = points;
     }
 
-    public List<Player> getParty() {
+    public List<UUID> getParty() {
         return party;
     }
 
-    public void setParty(List<Player> party) {
+    public void setParty(List<UUID> party) {
         this.party = party;
     }
 }

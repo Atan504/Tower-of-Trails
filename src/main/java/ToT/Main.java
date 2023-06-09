@@ -13,16 +13,20 @@ import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
 import ToT.PartyManagment.Commands.PartyChatCommand;
 import ToT.PartyManagment.Commands.PartyCommand;
+import ToT.PartyManagment.Listener.PlayerHit;
+import ToT.PartyManagment.Listener.PlayerLeft;
 import ToT.Utils.Config;
 import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public final class Main extends JavaPlugin {
 
@@ -50,6 +54,8 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SkillSelector(), this);
         getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
         getServer().getPluginManager().registerEvents(new DisplayItemChat(), this);
+        getServer().getPluginManager().registerEvents(new PlayerLeft(), this);
+        getServer().getPluginManager().registerEvents(new PlayerHit(), this);
 
         Objects.requireNonNull(this.getCommand("p")).setExecutor(new PartyChatCommand());
         Objects.requireNonNull(this.getCommand("party")).setExecutor(new PartyCommand());
@@ -76,10 +82,22 @@ public final class Main extends JavaPlugin {
                     return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
                 }
                 if (args[0].equals("promote") || args[0].equals("kick")) {
-                    List<Player> party = PartyManagment.getParty((Player) commandSender);
-                    List<Player> members = PartyManagment.getMembers(party);
+                    String name = commandSender.getName();
+                    Player player = Bukkit.getServer().getPlayer(name);
 
-                    return members.stream().map(Player::getName).toList();
+                    assert player != null;
+                    List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+                    List<UUID> members = PartyManagment.getMembers(party);
+
+                    Stream<String> stream = members.stream().map(p -> {
+                        Player p2 = Bukkit.getServer().getPlayer(p);
+                        OfflinePlayer p3 = Bukkit.getServer().getOfflinePlayer(p);
+
+                        if(p2 != null) return p2.getName();
+                        else return p3.getName();
+                    });
+
+                    return stream.toList();
                 }
             }
 

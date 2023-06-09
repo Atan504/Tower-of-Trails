@@ -6,6 +6,7 @@ import ToT.Objects.TPlayer;
 import ToT.Utils.PartyManagment;
 import ToT.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -160,14 +161,15 @@ public class PlayerChat implements Listener {
             if(!active.isEmpty()) {
                 if(active.get(0).asBoolean()) {
                     event.setCancelled(true);
-                    List<Player> party = PartyManagment.getParty(player);
-                    List<Player> members = PartyManagment.getMembers(party);
+                    List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+                    List<UUID> members = PartyManagment.getMembers(party);
 
-                    for (Player member : members) {
-                        if(PartyManagment.isOwner(party, player)) {
-                            member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
+                    for (UUID uuid : members) {
+                        Player p = Bukkit.getServer().getPlayer(uuid);
+                        if(PartyManagment.isOwner(party, player.getUniqueId())) {
+                            if(p != null) p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
                         } else {
-                            member.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
+                            if(p != null) p.sendMessage(ChatColor.BLUE + "[" + ChatColor.AQUA + ChatColor.BOLD + "PARTY" + ChatColor.BLUE + "] " + ChatColor.YELLOW + player.getName() + ChatColor.DARK_GRAY + ": " + ChatColor.GRAY + event.getMessage());
                         }
                     }
                 }
