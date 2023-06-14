@@ -1,19 +1,21 @@
 package ToT.Listener;
 
 import ToT.Utils.TextComponentUtil;
+import ToT.Utils.Utils;
+import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Material;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import ToT.Utils.DisplayItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static ToT.Main.plugin;
 
@@ -22,48 +24,54 @@ public class DisplayItemChat implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        String message = event.getMessage();
 
         if (event.getMessage().contains("[item]")) {
 
-            String new_message = "<" + player.getDisplayName() + "> " + message;
+            event.setCancelled(true);
 
-            String[] parts = new_message.split("\\[item\\]", -1);
+            String message = "<" + player.getDisplayName() + "> " + event.getMessage();
 
+            ItemStack item = player.getInventory().getItemInMainHand();
+            NBTItem nbti = new NBTItem(item);
+            String type = item.getType().getKey().toString();
+            int amount = item.getAmount();
+            ItemTag NBT = ItemTag.ofNbt(String.valueOf(nbti));
+            Item itemJSON = new Item(type, amount, NBT);
+
+            String name = Utils.toProperCase(item.getType().name());
+            ItemMeta meta = item.getItemMeta();
+            if(meta != null) {
+                if(meta.hasDisplayName()) {
+                    name = item.getItemMeta().getDisplayName();
+                }
+            }
+
+            String item_text = ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + name + ChatColor.DARK_GRAY + "]" + ChatColor.RESET;
+
+            List<String> list = new ArrayList<>(List.of(message.split(" ")));
+
+            TextComponent textComponent;
+            TextComponent itemComponent;
             BaseComponent[] messageComponents = new BaseComponent[0];
 
-            for (String part : parts) {
-                TextComponent textComponent = new TextComponent(part);
+            for(int i = 0; i < list.size(); i++) {
+                if(list.get(i).contains("[item]")) {
+                    list.set(i, list.get(i).replace("[item]", item_text));
+                    itemComponent = new TextComponent(item_text + " ");
 
-                ItemStack item = player.getInventory().getItemInMainHand();
+                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ITEM, itemJSON);
+                    itemComponent.setHoverEvent(hoverEvent);
 
-                if (item.getType() != Material.AIR) {
-                    ItemMeta itemMeta = item.getItemMeta();
-                    if (itemMeta != null && itemMeta.hasDisplayName()) {
-                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + itemMeta.getDisplayName() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
-                        BaseComponent[] hoverTextComponents = DisplayItem.getItemHoverTextComponents(item);
-                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
-
-                        if (messageComponents.length != 0)
-                            messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
-                    } else {
-                        TextComponent itemComponent = new TextComponent(ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + item.getType() + ChatColor.DARK_GRAY + "]" + ChatColor.RESET);
-                        BaseComponent[] hoverTextComponents = DisplayItem.getItemHoverTextComponents(item);
-                        itemComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverTextComponents));
-
-                        if (messageComponents.length != 0)
-                            messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
-                    }
+                    messageComponents = TextComponentUtil.append(messageComponents, itemComponent);
+                } else {
+                    textComponent = new TextComponent(list.get(i) + " ");
+                    messageComponents = TextComponentUtil.append(messageComponents, textComponent);
                 }
-
-                messageComponents = TextComponentUtil.append(messageComponents, textComponent);
             }
 
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 p.spigot().sendMessage(ChatMessageType.CHAT, messageComponents);
             }
-
-            event.setCancelled(true);
 
         }
     }
