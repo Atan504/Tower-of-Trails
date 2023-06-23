@@ -2,6 +2,7 @@ package ToT;
 
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.Utils.PartyManagment;
 import ToT.Utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,9 +17,7 @@ public class Tasks {
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
 
-                SpigotData.getInstance().enterEntity(p.getUniqueId());
-
-                TPlayer TP = ((TPlayer) SpigotData.getInstance().getEntity(p.getUniqueId()));
+                TPlayer data = PartyManagment.getData(p.getUniqueId());
 
                 ItemStack weapon = p.getInventory().getItemInMainHand();
                 ItemStack helmet = p.getInventory().getHelmet();
@@ -47,9 +46,11 @@ public class Tasks {
                             setBonus[7] = stats.getInt("Magic");
                 }
 
-                 int[][] totalStats = new int[][]{helmetStats,chestplateStats,leggingsStats,bootsStats,weaponStats,setBonus};
+                int[] equipments = Utils.sumArrays(new int[][]{helmetStats,chestplateStats,leggingsStats,bootsStats,weaponStats,setBonus});
 
-                        TP.setStats(Utils.sumArrays(totalStats));
+                 int[][] totalStats = new int[][]{equipments,data.getStatPoints()};
+
+                        data.setStats(Utils.sumArrays(totalStats));
 
                 /*
                 // Item Change
