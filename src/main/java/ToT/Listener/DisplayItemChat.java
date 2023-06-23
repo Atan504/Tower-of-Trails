@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static ToT.Main.plugin;
@@ -34,8 +35,15 @@ public class DisplayItemChat implements Listener {
             ItemStack item = player.getInventory().getItemInMainHand();
             NBTItem nbti = new NBTItem(item);
             String type = item.getType().getKey().toString();
-            int amount = item.getAmount();
             ItemTag NBT = ItemTag.ofNbt(String.valueOf(nbti));
+            int amount = Arrays.stream(player.getInventory().getContents())
+                    .filter(inventoryItem -> inventoryItem != null && inventoryItem.getType().getKey().toString().equals(type))
+                    .filter(inventoryItem -> {
+                        NBTItem nbtItem = new NBTItem(inventoryItem);
+                        return nbtItem.hasNBTData() && nbtItem.toString().equals(nbti.toString());
+                    })
+                    .mapToInt(ItemStack::getAmount)
+                    .sum();
             Item itemJSON = new Item(type, amount, NBT);
 
             String name = Utils.toProperCase(item.getType().name());
@@ -46,7 +54,7 @@ public class DisplayItemChat implements Listener {
                 }
             }
 
-            String item_text = ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + item.getAmount() + "x " + ChatColor.RESET + name + ChatColor.DARK_GRAY + "]" + ChatColor.RESET;
+            String item_text = ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + amount + "x " + ChatColor.RESET + name + ChatColor.DARK_GRAY + "]" + ChatColor.RESET;
 
             List<String> list = new ArrayList<>(List.of(message.split(" ")));
 
