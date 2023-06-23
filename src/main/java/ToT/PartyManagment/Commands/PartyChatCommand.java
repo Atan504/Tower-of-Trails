@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,14 +25,14 @@ public class PartyChatCommand implements CommandExecutor {
             return true;
         }
 
-        List<UUID> party = PartyManagment.getParty(player.getUniqueId());
+        ArrayList<UUID> party = PartyManagment.getParty(player.getUniqueId());
 
         if(!PartyManagment.inParty(party, player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "You are not in Party");
             return true;
         }
 
-        List<UUID> members = PartyManagment.getMembers(party);
+        ArrayList<UUID> members = PartyManagment.getMembers(party);
 
         members.forEach(p -> {
             Player p2 = Bukkit.getServer().getPlayer(p);
