@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class TEntity implements Serializable {
-    private UUID uuid;
+    private final UUID uuid;
 
     public TEntity(UUID uuid) {
         this.uuid = uuid;
