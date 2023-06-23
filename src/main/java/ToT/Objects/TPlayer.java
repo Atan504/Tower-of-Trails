@@ -13,9 +13,12 @@ public class TPlayer extends TEntity implements Serializable {
     private final ItemStack[] armors;
     private ItemStack weapon;
     private int[] stats;
+    private int[] statPoints;
     private int[] points;
     private String[] skills;
-    private List<UUID> party;
+    private ArrayList<UUID> party;
+    private int lvl;
+    private int xp;
 
     private final QuestManger qm;
     public TPlayer(UUID uuid) {
@@ -24,9 +27,12 @@ public class TPlayer extends TEntity implements Serializable {
         this.party = new ArrayList<>();
         this.armors = new ItemStack[4];     // helmet, chestplate, leggings, boots
         this.weapon = null;
-        this.stats = new int[8];            // mana, max_mana, str, hp, max_hp, def, magic, speed
+        this.stats = new int[8]; // mana, max_mana, str, hp, max_hp, def, magic, speed
+        this.statPoints = new int[]{10,10,0,20,20,0,0,0};
         this.points = new int[7];           // points, mana, str, hp, def, magic, speed
         this.skills = new String[5];        // slot#3, slot#4, slot#5, slot#6, slot#6
+        this.lvl = 1;
+        this.xp = 0;
     }
 
     public QuestManger getQm() {
@@ -45,10 +51,20 @@ public class TPlayer extends TEntity implements Serializable {
         this.weapon = weapon;
     }
 
-    public int[] getStats() { return stats; }
+    public int[] getStats() {
+        return stats;
+    }
 
     public void setStats(int[] stats) {
         this.stats = stats;
+    }
+
+    public int[] getStatPoints() {
+        return statPoints;
+    }
+
+    public void setStatPoints(int[] statPoints) {
+        this.statPoints = statPoints;
     }
 
     public String[] getSkills() {
@@ -67,11 +83,27 @@ public class TPlayer extends TEntity implements Serializable {
         this.points = points;
     }
 
-    public List<UUID> getParty() {
+    public ArrayList<UUID> getParty() {
         return party;
     }
 
-    public void setParty(List<UUID> party) {
+    public void setParty(ArrayList<UUID> party) {
         this.party = party;
+    }
+
+    public int getLvl() {
+        return lvl;
+    }
+
+    public void setLvl(int lvl) {
+        this.lvl = lvl;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 }
