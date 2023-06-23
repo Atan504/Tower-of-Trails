@@ -11,11 +11,14 @@ import ToT.Data.SpigotData;
 import ToT.Events.ChatEvent;
 import ToT.GUI.QuestsGUI;
 import ToT.Listener.*;
+import ToT.Objects.TPlayer;
 import ToT.PartyManagment.Commands.PartyChatCommand;
 import ToT.PartyManagment.Commands.PartyCommand;
 import ToT.PartyManagment.Listener.PlayerHit;
+import ToT.PartyManagment.Listener.PlayerJoin;
 import ToT.PartyManagment.Listener.PlayerLeft;
 import ToT.Utils.Config;
+import ToT.Utils.Data;
 import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -23,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -55,27 +59,16 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProfileMenu(), this);
         getServer().getPluginManager().registerEvents(new DisplayItemChat(), this);
         getServer().getPluginManager().registerEvents(new PlayerLeft(), this);
-        getServer().getPluginManager().registerEvents(new PlayerHit(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDamage(), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawn(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeath(), this);
 
         Objects.requireNonNull(this.getCommand("p")).setExecutor(new PartyChatCommand());
         Objects.requireNonNull(this.getCommand("party")).setExecutor(new PartyCommand());
         Objects.requireNonNull(this.getCommand("party")).setTabCompleter((commandSender, command, s, args) -> {
-            List<String> l = new ArrayList<>();
 
-            if (args.length == 1) {
-                l.add("create");
-                l.add("chat");
-                l.add("invite");
-                l.add("kick");
-                l.add("leave");
-                l.add("disband");
-                l.add("promote");
-                l.add("join");
-                l.add("gui");
-                l.add("info");
-
-                return l;
-            }
+            if (args.length == 1) return new ArrayList<>(Arrays.asList("create", "chat", "invite", "kick", "leave", "disband", "promote", "join", "gui", "info"));
 
             if (args.length == 2) {
                 if(args[0].equals("invite") || args[0].equals("join")) {
@@ -86,8 +79,8 @@ public final class Main extends JavaPlugin {
                     Player player = Bukkit.getServer().getPlayer(name);
 
                     assert player != null;
-                    List<UUID> party = PartyManagment.getParty(player.getUniqueId());
-                    List<UUID> members = PartyManagment.getMembers(party);
+                    ArrayList<UUID> party = PartyManagment.getParty(player.getUniqueId());
+                    ArrayList<UUID> members = PartyManagment.getMembers(party);
 
                     Stream<String> stream = members.stream().map(p -> {
                         Player p2 = Bukkit.getServer().getPlayer(p);
@@ -110,8 +103,72 @@ public final class Main extends JavaPlugin {
 
 
 
-
         // Matan
+
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            for (Player p : getServer().getOnlinePlayers()) {
+
+                TPlayer data = PartyManagment.getData(p.getUniqueId());
+                int[] stats = data.getStats();
+                int[] statPoints = data.getStatPoints();
+
+                if(stats[1] <= 0) {
+                    statPoints[1] = 20;
+                }
+
+                if(stats[4] <= 0) {
+                    statPoints[4] = 10;
+                }
+
+                if (stats[0] < 0) {
+                    statPoints[0] = 0;
+                }
+                if (stats[0] < stats[1]) {
+                    statPoints[0] += 1;
+                } else if (stats[0] > stats[1]) {
+                    statPoints[0] = stats[1];
+                }
+
+                if (p.getWalkSpeed() != ((float)(0.2 + (0.01 * (stats[6]))))){
+                    p.setWalkSpeed((float) (0.2 + (0.01 * (stats[6]))));
+                }
+
+                if(stats[3] > stats[4]) {
+                    statPoints[3] = stats[4];
+                }
+
+                double percentage = (double) stats[3] / stats[4];
+                double percentage2 = (double) stats[0] / stats[1];
+                int hp = (int) (percentage * 20);
+                int mana = (int) (percentage2 * 20);
+
+                if(hp < 0) hp = 0;
+                if(mana < 0) mana = 0;
+
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.RED + "❤ "+ stats[3] + "/" + stats[4] + " ❤" + ChatColor.WHITE + "                  " + ChatColor.AQUA + "Mana: " + stats[0] + "/" + stats[1]));
+                p.setHealth(hp);
+                p.setFoodLevel(mana);
+
+                PartyManagment.updatePartyScoreboard(p);
+
+            }
+        }, 0L, 20L);
+
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+                    for (Player p : getServer().getOnlinePlayers()) {
+                        if(!p.isDead()) {
+                            TPlayer data = PartyManagment.getData(p.getUniqueId());
+                            int[] stats = data.getStats();
+                            int[] statPoints = data.getStatPoints();
+
+                            if (stats[3] < stats[4]) {
+                                statPoints[3] += 1;
+                            }
+                        }
+                    }
+                }, 0L, 80L);
+
+        /*
         SetupConfig.Setup();
         getServer().getPluginManager().registerEvents(new SetupConfig(), this);
         Objects.requireNonNull(getCommand("reset")).setExecutor(new ResetCommand());
@@ -151,6 +208,7 @@ public final class Main extends JavaPlugin {
 
             }
         }, 0L, 20L);
+        */
     }
 
     @Override
