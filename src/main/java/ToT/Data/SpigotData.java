@@ -3,6 +3,7 @@ package ToT.Data;
 import ToT.Objects.TEntity;
 import ToT.Objects.TPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -36,7 +37,7 @@ public class SpigotData implements Serializable {
 
     public void enterEntity(UUID e) {
 
-        if (Bukkit.getPlayer(e) instanceof Player)
+        if (Bukkit.getPlayer(e) != null)
             map.putIfAbsent(e, new TPlayer(e));
         else
             map.putIfAbsent(e, new TEntity(e));
@@ -44,6 +45,17 @@ public class SpigotData implements Serializable {
 
     public TEntity getEntity(UUID e) {
         return map.get(e);
+    }
+
+    public List<UUID> getAll() {
+        return map.keySet().stream().toList().stream().filter(uuid -> {
+            Player p = Bukkit.getServer().getPlayer(uuid);
+            OfflinePlayer p2 = Bukkit.getServer().getOfflinePlayer(uuid);
+
+            if(p == null) {
+                return p2 != null;
+            } else return true;
+        }).toList();
     }
 
     public void save() {
