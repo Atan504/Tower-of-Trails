@@ -3,6 +3,7 @@ package ToT.Listener;
 import ToT.Utils.CustomMenu;
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.Utils.Data;
 import ToT.Utils.PartyManagment;
 import ToT.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
@@ -27,9 +28,6 @@ public class PlayerChat implements Listener {
 
         Player player = event.getPlayer();
         String message = event.getMessage();
-
-        SpigotData.getInstance().enterEntity(player.getUniqueId());
-        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
 
         if (message.toLowerCase().startsWith("class")) {
             event.setCancelled(true);
@@ -71,25 +69,29 @@ public class PlayerChat implements Listener {
             event.setCancelled(true);
 
             CustomMenu.openInventory(player, CustomMenu.getInventory(player, "profile_menu", 0));
-        } else if(message.equals("stats")) {
+        } else if(message.startsWith("stats")) {
             event.setCancelled(true);
-            int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
 
-            player.sendMessage("=-=-=-=-=-=-=-=-=-=-=-=");
-            player.sendMessage("Mana: " + stats[0]);
-            player.sendMessage("Max Mana: " + stats[1]);
-            player.sendMessage("Strength: " + stats[2]);
-            player.sendMessage("Health: " + stats[3]);
-            player.sendMessage("Max Health: " + stats[4]);
-            player.sendMessage("Defense: " + stats[5]);
-            player.sendMessage("Speed: " + stats[6]);
-            player.sendMessage("Magic: " + stats[7]);
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
+            int[] statPoints = data.getStatPoints();
 
-        } else if(message.equals("reset")) {
-            event.setCancelled(true);
-            int[] stats = ((TPlayer) SpigotData.getInstance().getEntity(player.getUniqueId())).getStats();
+            String[] args = message.split(" ");
 
-            Arrays.fill(stats, 0);
+            if(args.length >= 3) {
+                if(Utils.isInteger(args[2])) {
+                    System.out.println(1);
+                    if (Objects.equals(args[1], "mana")) statPoints[0] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "max_mana")) statPoints[1] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "str")) statPoints[2] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "hp")) statPoints[3] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "max_hp")) statPoints[4] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "def")) statPoints[5] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "speed")) statPoints[6] = Integer.parseInt(args[2]);
+                    if (Objects.equals(args[1], "magic")) statPoints[7] = Integer.parseInt(args[2]);
+                }
+            }
+
+            int[] stats = data.getStats();
 
             player.sendMessage("=-=-=-=-=-=-=-=-=-=-=-=");
             player.sendMessage("Mana: " + stats[0]);
@@ -104,13 +106,17 @@ public class PlayerChat implements Listener {
         } else if(message.equals("FABULUS")) {
             event.setCancelled(true);
 
-            TP.getPoints()[0] = 500;
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
+
+            data.getPoints()[0] = 500;
 
             player.sendMessage("YOU ARE THE TRUE FABULUS GOD!!!!!");
         } else if(message.equals("FABULOUS")) {
             event.setCancelled(true);
 
-            TP.getPoints()[0] = 2;
+            TPlayer data = PartyManagment.getData(player.getUniqueId());
+
+            data.getPoints()[0] = 2;
 
             player.sendMessage("YOU ARE NOT REAL FABULUS!!!!");
         } else if(message.equals("wynncraft")) {
@@ -161,8 +167,8 @@ public class PlayerChat implements Listener {
             if(!active.isEmpty()) {
                 if(active.get(0).asBoolean()) {
                     event.setCancelled(true);
-                    List<UUID> party = PartyManagment.getParty(player.getUniqueId());
-                    List<UUID> members = PartyManagment.getMembers(party);
+                    ArrayList<UUID> party = PartyManagment.getParty(player.getUniqueId());
+                    ArrayList<UUID> members = PartyManagment.getMembers(party);
 
                     for (UUID uuid : members) {
                         Player p = Bukkit.getServer().getPlayer(uuid);
