@@ -85,36 +85,6 @@ public class Utils {
         return res;
     }
 
-    public static class TotalPlayers {
-
-        List<UUID> UUIDList = new ArrayList<>();
-
-        public TotalPlayers() {
-            Player[] onlinePlayers = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
-            OfflinePlayer[] offlinePlayers = Bukkit.getServer().getOfflinePlayers();
-
-            for(Player p : onlinePlayers) {
-                this.addPlayer(p.getUniqueId());
-            }
-
-            for(OfflinePlayer p : offlinePlayers) {
-                this.addPlayer(p.getUniqueId());
-            }
-        }
-
-        public List<UUID> getUUIDList() {
-            return UUIDList;
-        }
-
-        public void addPlayer(UUID uuid) {
-            UUIDList.add(uuid);
-        }
-
-        public Player getPlayer(UUID uuid) {
-            return getServer().getPlayer(uuid);
-        }
-    }
-
     public static ConfigurationSection getConfig(String filePath, String name, String target) {
         String dirPath = plugin.getDataFolder() + "/data/" + filePath;
         String fileName = ChatColor.stripColor(name) + ".yml";
@@ -152,24 +122,24 @@ public class Utils {
         return configSection.getString("set");
     }
 
-    public static Integer getData(TPlayer TP, String stat_name) {
+    public static Integer getData(Data stats, String stat_name) {
         int value = 0;
-        if(stat_name.equals("Mana")) value = TP.getStats()[1];
-        if(stat_name.equals("Damage")) value = TP.getStats()[2];
-        if(stat_name.equals("Strength")) value = TP.getStats()[2];
-        if(stat_name.equals("Health")) value = TP.getStats()[4];
-        if(stat_name.equals("Defense")) value = TP.getStats()[5];
-        if(stat_name.equals("Speed")) value = TP.getStats()[6];
-        if(stat_name.equals("Magic")) value = TP.getStats()[7];
+        if(stat_name.equals("Mana")) value = stats.max_mana;
+        if(stat_name.equals("Damage")) value = stats.str;
+        if(stat_name.equals("Strength")) value = stats.str;
+        if(stat_name.equals("Health")) value = stats.max_hp;
+        if(stat_name.equals("Defense")) value = stats.def;
+        if(stat_name.equals("Speed")) value = stats.speed;
+        if(stat_name.equals("Magic")) value = stats.magic;
 
         return value;
     }
 
-    private static void updateStat(TPlayer TP, ConfigurationSection stat_config, List<String> list, String stat_name, String type) {
+    private static void updateStat(TPlayer data, Data stats, ConfigurationSection stat_config, List<String> list, String stat_name, String type) {
 
         Object value = stat_config.get(stat_name);
 
-        Integer stat_value = getData(TP, stat_name);
+        Integer stat_value = getData(stats, stat_name);
 
         String data_name = null;
         int index = -1;
@@ -212,16 +182,16 @@ public class Utils {
                 value = (int) (stat_value * ((double) value + 1));
                 stat_name = "Strength";
                 assert data_name != null;
-                TP.getStats()[index] = (int) value;
+                data.getStats()[index] = (int) value;
             } else {
                 assert data_name != null;
-                TP.getStats()[index] = stat_value + (int) value;
+                data.getStats()[index] = stat_value + (int) value;
             }
 
             if ((int) value > 0)
-                list.add(ChatColor.GREEN + "+" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(TP, stat_name) + ")");
+                list.add(ChatColor.GREEN + "+" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(stats, stat_name) + ")");
             else
-                list.add(ChatColor.RED + "-" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(TP, stat_name) + ")");
+                list.add(ChatColor.RED + "-" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(stats, stat_name) + ")");
         }
 
         if (Objects.equals(type, "remove")) {
@@ -237,20 +207,20 @@ public class Utils {
                 value = (int) (stat_value * ((double) value + 1));
                 stat_name = "Strength";
                 assert data_name != null;
-                TP.getStats()[index] = (int) value;
+                data.getStats()[index] = (int) value;
             } else {
                 assert data_name != null;
-                TP.getStats()[index] = stat_value - (int) value;
+                data.getStats()[index] = stat_value - (int) value;
             }
 
             if ((int) value > 0)
-                list.add(ChatColor.RED + "-" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(TP, stat_name) + ")");
+                list.add(ChatColor.RED + "-" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(stats, stat_name) + ")");
             else
-                list.add(ChatColor.GREEN + "+" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(TP, stat_name) + ")");
+                list.add(ChatColor.GREEN + "+" + value + ChatColor.GRAY + " " + stat_name + ChatColor.AQUA + " (" + getData(stats, stat_name) + ")");
         }
     }
 
-    public static void updateSet(Player player, TPlayer TP, String type) {
+    public static void updateSet(Player player, TPlayer data, Data stats, String type) {
 
         ItemStack helmet = player.getInventory().getHelmet();
         ItemStack chestplate = player.getInventory().getChestplate();
@@ -309,22 +279,22 @@ public class Utils {
                 List<String> list = new ArrayList<>();
 
                 if (statsSection.contains("Mana")) {
-                    updateStat(TP, statsSection, list, "Mana", "add");
+                    updateStat(data, stats, statsSection, list, "Mana", "add");
                 }
                 if (statsSection.contains("Strength")) {
-                    updateStat(TP, statsSection, list, "Strength", "add");
+                    updateStat(data, stats, statsSection, list, "Strength", "add");
                 }
                 if (statsSection.contains("Health")) {
-                    updateStat(TP, statsSection, list, "Health", "add");
+                    updateStat(data, stats, statsSection, list, "Health", "add");
                 }
                 if (statsSection.contains("Defense")) {
-                    updateStat(TP, statsSection, list, "Defense", "add");
+                    updateStat(data, stats, statsSection, list, "Defense", "add");
                 }
                 if (statsSection.contains("Speed")) {
-                    updateStat(TP, statsSection, list, "Speed", "add");
+                    updateStat(data, stats, statsSection, list, "Speed", "add");
                 }
                 if (statsSection.contains("Magic")) {
-                    updateStat(TP, statsSection, list, "Magic", "add");
+                    updateStat(data, stats, statsSection, list, "Magic", "add");
                 }
 
                 ConfigurationSection ifSection = Utils.getConfig("sets", helmetSet, "if");
@@ -337,25 +307,25 @@ public class Utils {
                             long time = player.getWorld().getTime();
                             if (time >= 0 && time < 12300) {
                                 if (daySection.contains("Damage")) {
-                                    updateStat(TP, daySection, list, "Damage", "add");
+                                    updateStat(data, stats, daySection, list, "Damage", "add");
                                 }
                                 if (daySection.contains("Mana")) {
-                                    updateStat(TP, daySection, list, "Mana", "add");
+                                    updateStat(data, stats, daySection, list, "Mana", "add");
                                 }
                                 if (daySection.contains("Strength")) {
-                                    updateStat(TP, daySection, list, "Strength", "add");
+                                    updateStat(data, stats, daySection, list, "Strength", "add");
                                 }
                                 if (daySection.contains("Health")) {
-                                    updateStat(TP, daySection, list, "Health", "add");
+                                    updateStat(data, stats, daySection, list, "Health", "add");
                                 }
                                 if (daySection.contains("Defense")) {
-                                    updateStat(TP, daySection, list, "Defense", "add");
+                                    updateStat(data, stats, daySection, list, "Defense", "add");
                                 }
                                 if (daySection.contains("Speed")) {
-                                    updateStat(TP, daySection, list, "Speed", "add");
+                                    updateStat(data, stats, daySection, list, "Speed", "add");
                                 }
                                 if (daySection.contains("Magic")) {
-                                    updateStat(TP, daySection, list, "Magic", "add");
+                                    updateStat(data, stats, daySection, list, "Magic", "add");
                                 }
                             }
                         }
@@ -364,25 +334,25 @@ public class Utils {
                             long time = player.getWorld().getTime();
                             if (!(time >= 0 && time < 12300)) {
                                 if (nightSection.contains("Damage")) {
-                                    updateStat(TP, nightSection, list, "Damage", "add");
+                                    updateStat(data, stats, nightSection, list, "Damage", "add");
                                 }
                                 if (nightSection.contains("Mana")) {
-                                    updateStat(TP, nightSection, list, "Mana", "add");
+                                    updateStat(data, stats, nightSection, list, "Mana", "add");
                                 }
                                 if (nightSection.contains("Strength")) {
-                                    updateStat(TP, nightSection, list, "Strength", "add");
+                                    updateStat(data, stats, nightSection, list, "Strength", "add");
                                 }
                                 if (nightSection.contains("Health")) {
-                                    updateStat(TP, nightSection, list, "Health", "add");
+                                    updateStat(data, stats, nightSection, list, "Health", "add");
                                 }
                                 if (nightSection.contains("Defense")) {
-                                    updateStat(TP, nightSection, list, "Defense", "add");
+                                    updateStat(data, stats, nightSection, list, "Defense", "add");
                                 }
                                 if (nightSection.contains("Speed")) {
-                                    updateStat(TP, nightSection, list, "Speed", "add");
+                                    updateStat(data, stats, nightSection, list, "Speed", "add");
                                 }
                                 if (nightSection.contains("Magic")) {
-                                    updateStat(TP, nightSection, list, "Magic", "add");
+                                    updateStat(data, stats, nightSection, list, "Magic", "add");
                                 }
                             }
                         }
@@ -405,10 +375,10 @@ public class Utils {
                     if(set == null) set = chestplateSet;
                     if(set == null) set = leggingsSet;
                     if(set == null) set = bootsSet;
-                    if(set == null) set = getArmorSetType(TP.getArmors()[0]);
-                    if(set == null) set = getArmorSetType(TP.getArmors()[1]);
-                    if(set == null) set = getArmorSetType(TP.getArmors()[2]);
-                    if(set == null) set = getArmorSetType(TP.getArmors()[3]);
+                    if(set == null) set = getArmorSetType(data.getArmors()[0]);
+                    if(set == null) set = getArmorSetType(data.getArmors()[1]);
+                    if(set == null) set = getArmorSetType(data.getArmors()[2]);
+                    if(set == null) set = getArmorSetType(data.getArmors()[3]);
                     if(set == null) set = "Unknown";
 
                     player.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RED + " has unequipped a full " + ChatColor.AQUA + set + " Set");
@@ -418,22 +388,22 @@ public class Utils {
                     List<String> list = new ArrayList<>();
 
                     if (statsSection.contains("Mana")) {
-                        updateStat(TP, statsSection, list, "Mana", "remove");
+                        updateStat(data, stats, statsSection, list, "Mana", "remove");
                     }
                     if (statsSection.contains("Strength")) {
-                        updateStat(TP, statsSection, list, "Strength", "remove");
+                        updateStat(data, stats, statsSection, list, "Strength", "remove");
                     }
                     if (statsSection.contains("Health")) {
-                        updateStat(TP, statsSection, list, "Health", "remove");
+                        updateStat(data, stats, statsSection, list, "Health", "remove");
                     }
                     if (statsSection.contains("Defense")) {
-                        updateStat(TP, statsSection, list, "Defense", "remove");
+                        updateStat(data, stats, statsSection, list, "Defense", "remove");
                     }
                     if (statsSection.contains("Speed")) {
-                        updateStat(TP, statsSection, list, "Speed", "remove");
+                        updateStat(data, stats, statsSection, list, "Speed", "remove");
                     }
                     if (statsSection.contains("Magic")) {
-                        updateStat(TP, statsSection, list, "Magic", "remove");
+                        updateStat(data, stats, statsSection, list, "Magic", "remove");
                     }
 
                     ConfigurationSection ifSection = Utils.getConfig("sets", set, "if");
@@ -446,25 +416,25 @@ public class Utils {
                                 long time = player.getWorld().getTime();
                                 if (time >= 0 && time < 12300) {
                                     if (daySection.contains("Damage")) {
-                                        updateStat(TP, daySection, list, "Damage", "remove");
+                                        updateStat(data, stats, daySection, list, "Damage", "remove");
                                     }
                                     if (daySection.contains("Mana")) {
-                                        updateStat(TP, daySection, list, "Mana", "remove");
+                                        updateStat(data, stats, daySection, list, "Mana", "remove");
                                     }
                                     if (daySection.contains("Strength")) {
-                                        updateStat(TP, daySection, list, "Strength", "remove");
+                                        updateStat(data, stats, daySection, list, "Strength", "remove");
                                     }
                                     if (daySection.contains("Health")) {
-                                        updateStat(TP, daySection, list, "Health", "remove");
+                                        updateStat(data, stats, daySection, list, "Health", "remove");
                                     }
                                     if (daySection.contains("Defense")) {
-                                        updateStat(TP, daySection, list, "Defense", "remove");
+                                        updateStat(data, stats, daySection, list, "Defense", "remove");
                                     }
                                     if (daySection.contains("Speed")) {
-                                        updateStat(TP, daySection, list, "Speed", "remove");
+                                        updateStat(data, stats, daySection, list, "Speed", "remove");
                                     }
                                     if (daySection.contains("Magic")) {
-                                        updateStat(TP, daySection, list, "Magic", "remove");
+                                        updateStat(data, stats, daySection, list, "Magic", "remove");
                                     }
                                 }
                             }
@@ -473,25 +443,25 @@ public class Utils {
                                 long time = player.getWorld().getTime();
                                 if (!(time >= 0 && time < 12300)) {
                                     if (nightSection.contains("Damage")) {
-                                        updateStat(TP, nightSection, list, "Damage", "remove");
+                                        updateStat(data, stats, nightSection, list, "Damage", "remove");
                                     }
                                     if (nightSection.contains("Mana")) {
-                                        updateStat(TP, nightSection, list, "Mana", "remove");
+                                        updateStat(data, stats, nightSection, list, "Mana", "remove");
                                     }
                                     if (nightSection.contains("Strength")) {
-                                        updateStat(TP, nightSection, list, "Strength", "remove");
+                                        updateStat(data, stats, nightSection, list, "Strength", "remove");
                                     }
                                     if (nightSection.contains("Health")) {
-                                        updateStat(TP, nightSection, list, "Health", "remove");
+                                        updateStat(data, stats, nightSection, list, "Health", "remove");
                                     }
                                     if (nightSection.contains("Defense")) {
-                                        updateStat(TP, nightSection, list, "Defense", "remove");
+                                        updateStat(data, stats, nightSection, list, "Defense", "remove");
                                     }
                                     if (nightSection.contains("Speed")) {
-                                        updateStat(TP, nightSection, list, "Speed", "remove");
+                                        updateStat(data, stats, nightSection, list, "Speed", "remove");
                                     }
                                     if (nightSection.contains("Magic")) {
-                                        updateStat(TP, nightSection, list, "Magic", "remove");
+                                        updateStat(data, stats, nightSection, list, "Magic", "remove");
                                     }
                                 }
                             }
@@ -513,8 +483,8 @@ public class Utils {
 
     public static void addStats(Player player, ItemStack item) {
 
-        SpigotData.getInstance().enterEntity(player.getUniqueId());
-        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
+        TPlayer data = PartyManagment.getData(player.getUniqueId());
+        Data stats = new Data(player.getUniqueId());
 
         String name = ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName());
 
@@ -528,22 +498,22 @@ public class Utils {
 
         if (statsSection != null) {
             if (statsSection.contains("Mana")) {
-                updateStat(TP, statsSection, list, "Mana", "add");
+                updateStat(data, stats, statsSection, list, "Mana", "add");
             }
             if (statsSection.contains("Strength")) {
-                updateStat(TP, statsSection, list, "Strength", "add");
+                updateStat(data, stats, statsSection, list, "Strength", "add");
             }
             if (statsSection.contains("Health")) {
-                updateStat(TP, statsSection, list, "Health", "add");
+                updateStat(data, stats, statsSection, list, "Health", "add");
             }
             if (statsSection.contains("Defense")) {
-                updateStat(TP, statsSection, list, "Defense", "add");
+                updateStat(data, stats, statsSection, list, "Defense", "add");
             }
             if (statsSection.contains("Speed")) {
-                updateStat(TP, statsSection, list, "Speed", "add");
+                updateStat(data, stats, statsSection, list, "Speed", "add");
             }
             if (statsSection.contains("Magic")) {
-                updateStat(TP, statsSection, list, "Magic", "add");
+                updateStat(data, stats, statsSection, list, "Magic", "add");
             }
 
             if (!list.isEmpty()) {
@@ -554,7 +524,7 @@ public class Utils {
             }
 
             if(configSection.contains("set")) {
-                updateSet(player, TP, "added");
+                updateSet(player, data, stats, "added");
             }
 
         }
@@ -562,8 +532,8 @@ public class Utils {
 
     public static void removeStats(Player player, ItemStack item) {
 
-        SpigotData.getInstance().enterEntity(player.getUniqueId());
-        TPlayer TP = ((TPlayer) (SpigotData.getInstance().getEntity(player.getUniqueId())));
+        TPlayer data = PartyManagment.getData(player.getUniqueId());
+        Data stats = new Data(player.getUniqueId());
 
         String name = ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName());
 
@@ -593,22 +563,22 @@ public class Utils {
 
                 if (statsSection != null) {
                     if (statsSection.contains("Mana")) {
-                        updateStat(TP, statsSection, list, "Mana", "remove");
+                        updateStat(data, stats, statsSection, list, "Mana", "remove");
                     }
                     if (statsSection.contains("Strength")) {
-                        updateStat(TP, statsSection, list, "Strength", "remove");
+                        updateStat(data, stats, statsSection, list, "Strength", "remove");
                     }
                     if (statsSection.contains("Health")) {
-                        updateStat(TP, statsSection, list, "Health", "remove");
+                        updateStat(data, stats, statsSection, list, "Health", "remove");
                     }
                     if (statsSection.contains("Defense")) {
-                        updateStat(TP, statsSection, list, "Defense", "remove");
+                        updateStat(data, stats, statsSection, list, "Defense", "remove");
                     }
                     if (statsSection.contains("Speed")) {
-                        updateStat(TP, statsSection, list, "Speed", "remove");
+                        updateStat(data, stats, statsSection, list, "Speed", "remove");
                     }
                     if (statsSection.contains("Magic")) {
-                        updateStat(TP, statsSection, list, "Magic", "remove");
+                        updateStat(data, stats, statsSection, list, "Magic", "remove");
                     }
 
                     if (!list.isEmpty()) {
@@ -620,7 +590,7 @@ public class Utils {
 
                     assert configSection != null;
                     if (configSection.contains("set")) {
-                        updateSet(player, TP, "removed");
+                        updateSet(player, data, stats, "removed");
                     }
                 }
 
@@ -836,6 +806,15 @@ public class Utils {
     public static int generateRandomInteger(int min, int max) {
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
+    }
+
+    public static boolean isInteger(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public static String getSet(ItemStack item) {
