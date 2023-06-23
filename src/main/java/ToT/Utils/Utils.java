@@ -1,6 +1,5 @@
 package ToT.Utils;
 
-import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;

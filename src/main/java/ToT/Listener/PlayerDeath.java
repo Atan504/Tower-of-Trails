@@ -1,26 +1,14 @@
 package ToT.Listener;
 
-import ToT.Objects.TPlayer;
-import ToT.Utils.PartyManagment;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.Objects;
 
 import static ToT.Main.plugin;
 
@@ -52,7 +40,7 @@ public class PlayerDeath implements Listener {
     }
 
     private void startCountdown(Player player) {
-        BukkitTask countdownTask = new BukkitRunnable() {
+        new BukkitRunnable() {
             int count = 3;
 
             @Override

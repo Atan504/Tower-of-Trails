@@ -1,9 +1,7 @@
 package ToT.Listener;
 
 import ToT.Utils.CustomMenu;
-import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
-import ToT.Utils.Data;
 import ToT.Utils.PartyManagment;
 import ToT.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;

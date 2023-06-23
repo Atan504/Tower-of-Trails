@@ -1,6 +1,5 @@
 package ToT;
 
-import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
 import ToT.Utils.PartyManagment;
 import ToT.Utils.Utils;
