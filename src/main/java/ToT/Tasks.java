@@ -1,14 +1,13 @@
 package ToT;
 
 import ToT.Objects.TPlayer;
-import ToT.Utils.PartyManagment;
-import ToT.Utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import static ToT.Main.plugin;
+import static ToT.Utils.Utils.getPlayerData;
 
 public class Tasks {
 
@@ -16,7 +15,7 @@ public class Tasks {
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
 
-                TPlayer data = PartyManagment.getData(p.getUniqueId());
+                TPlayer data = getPlayerData(p.getUniqueId());
 
                 ItemStack weapon = p.getInventory().getItemInMainHand();
                 ItemStack helmet = p.getInventory().getHelmet();
@@ -24,18 +23,18 @@ public class Tasks {
                 ItemStack leggings = p.getInventory().getLeggings();
                 ItemStack boots = p.getInventory().getBoots();
 
-                if(!Utils.ArmorType(weapon).equals("NONE")) weapon = null;
+                if(!ToT.Utils.Utils.ArmorType(weapon).equals("NONE")) weapon = null;
 
-                int[] helmetStats = Utils.getItemStats(helmet);
-                int[] chestplateStats = Utils.getItemStats(chestplate);
-                int[] leggingsStats = Utils.getItemStats(leggings);
-                int[] bootsStats = Utils.getItemStats(boots);
-                int[] weaponStats = Utils.getItemStats(weapon);
+                int[] helmetStats = ToT.Utils.Utils.getItemStats(helmet);
+                int[] chestplateStats = ToT.Utils.Utils.getItemStats(chestplate);
+                int[] leggingsStats = ToT.Utils.Utils.getItemStats(leggings);
+                int[] bootsStats = ToT.Utils.Utils.getItemStats(boots);
+                int[] weaponStats = ToT.Utils.Utils.getItemStats(weapon);
 
                 int[] setBonus = new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
 
-                if (Utils.getSet(helmet).equals(Utils.getSet(chestplate)) && Utils.getSet(chestplate).equals(Utils.getSet(leggings)) && Utils.getSet(leggings).equals(Utils.getSet(boots))) {
-                            ConfigurationSection stats = Utils.getConfig("sets", Utils.getSet(helmet), "stats");
+                if (ToT.Utils.Utils.getSet(helmet).equals(ToT.Utils.Utils.getSet(chestplate)) && ToT.Utils.Utils.getSet(chestplate).equals(ToT.Utils.Utils.getSet(leggings)) && ToT.Utils.Utils.getSet(leggings).equals(ToT.Utils.Utils.getSet(boots))) {
+                            ConfigurationSection stats = ToT.Utils.Utils.getConfig("sets", ToT.Utils.Utils.getSet(helmet), "stats");
 
                             setBonus[1] = stats.getInt("Mana");
                             setBonus[2] = stats.getInt("Strength");
@@ -45,11 +44,11 @@ public class Tasks {
                             setBonus[7] = stats.getInt("Magic");
                 }
 
-                int[] equipments = Utils.sumArrays(new int[][]{helmetStats,chestplateStats,leggingsStats,bootsStats,weaponStats,setBonus});
+                int[] equipments = ToT.Utils.Utils.sumArrays(new int[][]{helmetStats,chestplateStats,leggingsStats,bootsStats,weaponStats,setBonus});
 
                  int[][] totalStats = new int[][]{equipments,data.getStatPoints()};
 
-                        data.setStats(Utils.sumArrays(totalStats));
+                        data.setStats(ToT.Utils.Utils.sumArrays(totalStats));
 
                 /*
                 // Item Change
