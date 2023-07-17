@@ -1,11 +1,13 @@
-package ToT.Listener;
+package ToT.System.DeathScreen.Listener;
 
 import ToT.Objects.TPlayer;
-import ToT.Utils.PartyManagment;
+import ToT.System.PartyManagment.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import static ToT.Utils.Utils.getPlayerData;
 
 public class PlayerRespawn implements Listener {
     @EventHandler
@@ -14,7 +16,7 @@ public class PlayerRespawn implements Listener {
 
         player.setFireTicks(0);
 
-        TPlayer data = PartyManagment.getData(player.getUniqueId());
+        TPlayer data = getPlayerData(player.getUniqueId());
         int[] stats = data.getStats();
         int[] statPoints = data.getStatPoints();
 
