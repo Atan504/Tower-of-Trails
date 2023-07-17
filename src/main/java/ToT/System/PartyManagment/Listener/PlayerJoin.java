@@ -1,7 +1,6 @@
-package ToT.PartyManagment.Listener;
+package ToT.System.PartyManagment.Listener;
 
-import ToT.Objects.TPlayer;
-import ToT.Utils.PartyManagment;
+import ToT.System.PartyManagment.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,17 +15,17 @@ public class PlayerJoin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        ArrayList<UUID> party = PartyManagment.getParty(player.getUniqueId());
+        ArrayList<UUID> party = Utils.getParty(player.getUniqueId());
 
-        if(!PartyManagment.inParty(party, player.getUniqueId())) {
+        if(!Utils.inParty(party, player.getUniqueId())) {
             return;
         }
 
-        ArrayList<UUID> members = PartyManagment.getMembers(party);
+        ArrayList<UUID> members = Utils.getMembers(party);
 
         members.forEach(uuid -> {
             Player p = Bukkit.getServer().getPlayer(uuid);
-            if(p != null) PartyManagment.updatePartyScoreboard(p);
+            if(p != null) Utils.updatePartyScoreboard(p);
         });
     }
 }
