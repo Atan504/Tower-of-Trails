@@ -1,7 +1,8 @@
-package ToT.Utils;
+package ToT.System.PartyManagment;
 
 import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import ToT.Utils.Data;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -14,7 +15,10 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class PartyManagment implements Serializable {
+import static ToT.Utils.Utils.HealthBar;
+import static ToT.Utils.Utils.getPlayerData;
+
+public class Utils implements Serializable {
 
     static ScoreboardManager scoreboardManager;
     static Scoreboard scoreboard;
@@ -23,9 +27,9 @@ public class PartyManagment implements Serializable {
     public static void updatePartyScoreboard(Player player) {
         scoreboardManager = Bukkit.getScoreboardManager();
 
-        ArrayList<UUID> party = PartyManagment.getParty(player.getUniqueId());
+        ArrayList<UUID> party = Utils.getParty(player.getUniqueId());
 
-        if(!PartyManagment.inParty(party, player.getUniqueId())) {
+        if(!Utils.inParty(party, player.getUniqueId())) {
             if(scoreboard == null) return;
             Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
             if (objective != null) {
@@ -52,7 +56,7 @@ public class PartyManagment implements Serializable {
         ArrayList<Integer> lvls = new ArrayList<>();
 
         members.forEach(p -> {
-            TPlayer data = getData(p);
+            TPlayer data = getPlayerData(p);
             int lvl = data.getLvl();
             lvls.add(lvl);
         });
@@ -62,14 +66,15 @@ public class PartyManagment implements Serializable {
         members.forEach(uuid -> {
             Player p = Bukkit.getServer().getPlayer(uuid);
             OfflinePlayer p2 = Bukkit.getServer().getOfflinePlayer(uuid);
-            TPlayer data = getData(uuid);
+            TPlayer data = getPlayerData(uuid);
             int lvl = data.getLvl();
 
-            String hp = HealthBar(p);
-            if(ChatColor.stripColor(hp).equals("[||0||]")) hp = ChatColor.DARK_RED + "[" + ChatColor.RED + "☠" + ChatColor.DARK_RED + "]";
+            if (p != null) {
+                String hp = HealthBar(p);
+                if(ChatColor.stripColor(hp).equals("[||0||]") || data.isDeath()) hp = ChatColor.DARK_RED + "[" + ChatColor.RED + "☠" + ChatColor.DARK_RED + "]";
 
-            if (p != null) list.add(ChatColor.YELLOW + "- " + hp + " " + ChatColor.RESET + p.getName().substring(0, 8) + ChatColor.GRAY + " [" + lvl + "]");
-            else list.add(ChatColor.YELLOW + "- " + ChatColor.GRAY + p2.getName());
+                list.add(ChatColor.YELLOW + "- " + hp + " " + ChatColor.RESET + p.getName().substring(0, 8) + ChatColor.GRAY + " [" + lvl + "]");
+            } else list.add(ChatColor.YELLOW + "- " + ChatColor.GRAY + p2.getName());
         });
         list.add("");
 
@@ -90,41 +95,10 @@ public class PartyManagment implements Serializable {
         player.setScoreboard(scoreboard);
     }
 
-
-    public static String HealthBar(Entity entity) {
-        // Construct the health bar string
-        Data stats = new Data(entity.getUniqueId());
-        double health = stats.hp;
-        StringBuilder healthBar = new StringBuilder(ChatColor.DARK_RED + "[");
-        int barSize = 4;
-        double maxHealth = stats.max_hp;
-        double percentage = health / maxHealth;
-        int filledBars = (int) (percentage * barSize);
-
-        DecimalFormat decimalFormat = new DecimalFormat("0");
-        String formattedHealth = decimalFormat.format(health);
-
-        for(var i = 0; i < 4; i++) {
-            if(i == 2) healthBar.append(ChatColor.RED).append(formattedHealth);
-            if(i <= filledBars) healthBar.append(ChatColor.RED).append("|");
-            else healthBar.append(ChatColor.GRAY).append("|");
-        }
-        healthBar.append(ChatColor.DARK_RED).append("]");
-
-        return healthBar.toString();
-    }
-
-
-    public static TPlayer getData(UUID uuid) {
-        SpigotData.getInstance().enterEntity(uuid);
-
-        return ((TPlayer) SpigotData.getInstance().getEntity(uuid));
-    }
-
     public static ArrayList<UUID> getParty(UUID uuid) {
 
         Stream<UUID> stream = SpigotData.getInstance().getAll().stream().filter(id -> {
-            TPlayer data = getData(id);
+            TPlayer data = getPlayerData(id);
             ArrayList<UUID> party = data.getParty();
 
             return party.contains(uuid);
@@ -135,7 +109,7 @@ public class PartyManagment implements Serializable {
         if(list.size() == 0) return new ArrayList<>();
 
         UUID owner = list.get(0);
-        TPlayer data = getData(owner);
+        TPlayer data = getPlayerData(owner);
 
         return new ArrayList<>(data.getParty());
     }
