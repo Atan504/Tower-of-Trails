@@ -11,3 +11,4 @@ color: 135,135,135
 flags:
   - "HIDE_ATTRIBUTES"
   - "HIDE_UNBREAKABLE"
+  - "HIDE_DYE"
