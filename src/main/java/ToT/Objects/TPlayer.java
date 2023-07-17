@@ -1,6 +1,9 @@
 package ToT.Objects;
 
 import ToT.Quests.QuestManger;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.logging.log4j.core.pattern.ArrayPatternConverter;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
@@ -18,6 +21,8 @@ public class TPlayer extends TEntity implements Serializable {
     private ArrayList<UUID> party;
     private int lvl;
     private int xp;
+    private ArrayList<ItemStack[]> bank;
+    private boolean death;
 
     private final QuestManger qm;
     public TPlayer(UUID uuid) {
@@ -32,6 +37,8 @@ public class TPlayer extends TEntity implements Serializable {
         this.skills = new String[5];        // slot#3, slot#4, slot#5, slot#6, slot#6
         this.lvl = 1;
         this.xp = 0;
+        this.bank = new ArrayList<>();
+        this.death = false;
     }
 
     public QuestManger getQm() {
@@ -104,5 +111,21 @@ public class TPlayer extends TEntity implements Serializable {
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public ArrayList<ItemStack[]> getBank() {
+        return bank;
+    }
+
+    public void setBank(ArrayList<ItemStack[]> bank) {
+        this.bank = bank;
+    }
+
+    public boolean isDeath() {
+        return death;
+    }
+
+    public void setDeath(boolean death) {
+        this.death = death;
     }
 }
