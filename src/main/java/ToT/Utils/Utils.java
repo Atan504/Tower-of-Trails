@@ -1,15 +1,21 @@
 package ToT.Utils;
 
+import ToT.Data.SpigotData;
 import ToT.Objects.TPlayer;
+import net.md_5.bungee.api.chat.ItemTag;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.tags.ItemTagAdapterContext;
+import org.bukkit.inventory.meta.tags.ItemTagType;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,7 +34,7 @@ import static org.bukkit.Bukkit.getServer;
 public class Utils {
 
     public static String ArmorType(ItemStack item) {
-        if(item.getType().equals(Material.LEATHER_HELMET) ||
+        if (item.getType().equals(Material.LEATHER_HELMET) ||
                 item.getType().equals(Material.IRON_HELMET) ||
                 item.getType().equals(Material.CHAINMAIL_HELMET) ||
                 item.getType().equals(Material.GOLDEN_HELMET) ||
@@ -37,7 +44,7 @@ public class Utils {
             return "HELMET";
         }
 
-        if(item.getType().equals(Material.LEATHER_CHESTPLATE) ||
+        if (item.getType().equals(Material.LEATHER_CHESTPLATE) ||
                 item.getType().equals(Material.IRON_CHESTPLATE) ||
                 item.getType().equals(Material.CHAINMAIL_CHESTPLATE) ||
                 item.getType().equals(Material.GOLDEN_CHESTPLATE) ||
@@ -47,7 +54,7 @@ public class Utils {
             return "CHESTPLATE";
         }
 
-        if(item.getType().equals(Material.LEATHER_LEGGINGS) ||
+        if (item.getType().equals(Material.LEATHER_LEGGINGS) ||
                 item.getType().equals(Material.IRON_LEGGINGS) ||
                 item.getType().equals(Material.CHAINMAIL_LEGGINGS) ||
                 item.getType().equals(Material.GOLDEN_LEGGINGS) ||
@@ -56,7 +63,7 @@ public class Utils {
             return "LEGGINGS";
         }
 
-        if(item.getType().equals(Material.LEATHER_BOOTS) ||
+        if (item.getType().equals(Material.LEATHER_BOOTS) ||
                 item.getType().equals(Material.IRON_BOOTS) ||
                 item.getType().equals(Material.CHAINMAIL_BOOTS) ||
                 item.getType().equals(Material.GOLDEN_BOOTS) ||
@@ -68,13 +75,13 @@ public class Utils {
         return "NONE";
     }
 
-    public static void addToArray(int[] arr,int[] value){
+    public static void addToArray(int[] arr, int[] value) {
         for (int i = 0; i < value.length; i++) {
-            arr[i]+=value[i];
+            arr[i] += value[i];
         }
     }
 
-    public static int[] sumArrays(int[][] arr){
+    public static int[] sumArrays(int[][] arr) {
         int[] res = new int[arr[0].length];
         for (int[] ints : arr) {
             for (int j = 0; j < ints.length; j++) {
@@ -116,20 +123,20 @@ public class Utils {
 
         String name = ChatColor.stripColor(Objects.requireNonNull(armor.getItemMeta()).getDisplayName());
 
-        ConfigurationSection configSection = Utils.getConfig("items", name, "");
+        ConfigurationSection configSection = ToT.Utils.Utils.getConfig("items", name, "");
 
         return configSection.getString("set");
     }
 
     public static Integer getData(Data stats, String stat_name) {
         int value = 0;
-        if(stat_name.equals("Mana")) value = stats.max_mana;
-        if(stat_name.equals("Damage")) value = stats.str;
-        if(stat_name.equals("Strength")) value = stats.str;
-        if(stat_name.equals("Health")) value = stats.max_hp;
-        if(stat_name.equals("Defense")) value = stats.def;
-        if(stat_name.equals("Speed")) value = stats.speed;
-        if(stat_name.equals("Magic")) value = stats.magic;
+        if (stat_name.equals("Mana")) value = stats.max_mana;
+        if (stat_name.equals("Damage")) value = stats.str;
+        if (stat_name.equals("Strength")) value = stats.str;
+        if (stat_name.equals("Health")) value = stats.max_hp;
+        if (stat_name.equals("Defense")) value = stats.def;
+        if (stat_name.equals("Speed")) value = stats.speed;
+        if (stat_name.equals("Magic")) value = stats.magic;
 
         return value;
     }
@@ -242,20 +249,20 @@ public class Utils {
             count++;
         }
 
-        if(helmet == null) helmet = new ItemStack(Material.STONE);
-        if(chestplate == null) chestplate = new ItemStack(Material.STONE);
-        if(leggings == null) leggings = new ItemStack(Material.STONE);
-        if(boots == null) boots = new ItemStack(Material.STONE);
+        if (helmet == null) helmet = new ItemStack(Material.STONE);
+        if (chestplate == null) chestplate = new ItemStack(Material.STONE);
+        if (leggings == null) leggings = new ItemStack(Material.STONE);
+        if (boots == null) boots = new ItemStack(Material.STONE);
 
         String helmetName = ChatColor.stripColor(Objects.requireNonNull(helmet.getItemMeta()).getDisplayName());
         String chestplateName = ChatColor.stripColor(Objects.requireNonNull(chestplate.getItemMeta()).getDisplayName());
         String leggingsName = ChatColor.stripColor(Objects.requireNonNull(leggings.getItemMeta()).getDisplayName());
         String bootsName = ChatColor.stripColor(Objects.requireNonNull(boots.getItemMeta()).getDisplayName());
 
-        ConfigurationSection helmetConfigSection = Utils.getConfig("items", helmetName, "");
-        ConfigurationSection chestplateConfigSection = Utils.getConfig("items", chestplateName, "");
-        ConfigurationSection leggingsConfigSection = Utils.getConfig("items", leggingsName, "");
-        ConfigurationSection bootsConfigSection = Utils.getConfig("items", bootsName, "");
+        ConfigurationSection helmetConfigSection = ToT.Utils.Utils.getConfig("items", helmetName, "");
+        ConfigurationSection chestplateConfigSection = ToT.Utils.Utils.getConfig("items", chestplateName, "");
+        ConfigurationSection leggingsConfigSection = ToT.Utils.Utils.getConfig("items", leggingsName, "");
+        ConfigurationSection bootsConfigSection = ToT.Utils.Utils.getConfig("items", bootsName, "");
 
         String helmetSet = (String) helmetConfigSection.get("set");
         String chestplateSet = (String) chestplateConfigSection.get("set");
@@ -273,7 +280,7 @@ public class Utils {
 
                 player.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has equipped a full " + ChatColor.AQUA + helmetSet + " Set");
 
-                ConfigurationSection statsSection = Utils.getConfig("sets", helmetSet, "stats");
+                ConfigurationSection statsSection = ToT.Utils.Utils.getConfig("sets", helmetSet, "stats");
 
                 List<String> list = new ArrayList<>();
 
@@ -296,13 +303,13 @@ public class Utils {
                     updateStat(data, stats, statsSection, list, "Magic", "add");
                 }
 
-                ConfigurationSection ifSection = Utils.getConfig("sets", helmetSet, "if");
+                ConfigurationSection ifSection = ToT.Utils.Utils.getConfig("sets", helmetSet, "if");
 
-                if(ifSection != null) {
+                if (ifSection != null) {
                     ConfigurationSection timeSection = ifSection.getConfigurationSection("time");
-                    if(timeSection != null) {
+                    if (timeSection != null) {
                         ConfigurationSection daySection = timeSection.getConfigurationSection("day");
-                        if(daySection != null) {
+                        if (daySection != null) {
                             long time = player.getWorld().getTime();
                             if (time >= 0 && time < 12300) {
                                 if (daySection.contains("Damage")) {
@@ -329,7 +336,7 @@ public class Utils {
                             }
                         }
                         ConfigurationSection nightSection = timeSection.getConfigurationSection("night");
-                        if(nightSection != null) {
+                        if (nightSection != null) {
                             long time = player.getWorld().getTime();
                             if (!(time >= 0 && time < 12300)) {
                                 if (nightSection.contains("Damage")) {
@@ -371,18 +378,18 @@ public class Utils {
 
                     String set = helmetSet;
 
-                    if(set == null) set = chestplateSet;
-                    if(set == null) set = leggingsSet;
-                    if(set == null) set = bootsSet;
-                    if(set == null) set = getArmorSetType(data.getArmors()[0]);
-                    if(set == null) set = getArmorSetType(data.getArmors()[1]);
-                    if(set == null) set = getArmorSetType(data.getArmors()[2]);
-                    if(set == null) set = getArmorSetType(data.getArmors()[3]);
-                    if(set == null) set = "Unknown";
+                    if (set == null) set = chestplateSet;
+                    if (set == null) set = leggingsSet;
+                    if (set == null) set = bootsSet;
+                    if (set == null) set = getArmorSetType(data.getArmors()[0]);
+                    if (set == null) set = getArmorSetType(data.getArmors()[1]);
+                    if (set == null) set = getArmorSetType(data.getArmors()[2]);
+                    if (set == null) set = getArmorSetType(data.getArmors()[3]);
+                    if (set == null) set = "Unknown";
 
                     player.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RED + " has unequipped a full " + ChatColor.AQUA + set + " Set");
 
-                    ConfigurationSection statsSection = Utils.getConfig("sets", set, "stats");
+                    ConfigurationSection statsSection = ToT.Utils.Utils.getConfig("sets", set, "stats");
 
                     List<String> list = new ArrayList<>();
 
@@ -405,13 +412,13 @@ public class Utils {
                         updateStat(data, stats, statsSection, list, "Magic", "remove");
                     }
 
-                    ConfigurationSection ifSection = Utils.getConfig("sets", set, "if");
+                    ConfigurationSection ifSection = ToT.Utils.Utils.getConfig("sets", set, "if");
 
-                    if(ifSection != null) {
+                    if (ifSection != null) {
                         ConfigurationSection timeSection = ifSection.getConfigurationSection("time");
-                        if(timeSection != null) {
+                        if (timeSection != null) {
                             ConfigurationSection daySection = timeSection.getConfigurationSection("day");
-                            if(daySection != null) {
+                            if (daySection != null) {
                                 long time = player.getWorld().getTime();
                                 if (time >= 0 && time < 12300) {
                                     if (daySection.contains("Damage")) {
@@ -438,7 +445,7 @@ public class Utils {
                                 }
                             }
                             ConfigurationSection nightSection = timeSection.getConfigurationSection("night");
-                            if(nightSection != null) {
+                            if (nightSection != null) {
                                 long time = player.getWorld().getTime();
                                 if (!(time >= 0 && time < 12300)) {
                                     if (nightSection.contains("Damage")) {
@@ -482,7 +489,7 @@ public class Utils {
 
     public static void addStats(Player player, ItemStack item) {
 
-        TPlayer data = PartyManagment.getData(player.getUniqueId());
+        TPlayer data = getPlayerData(player.getUniqueId());
         Data stats = new Data(player.getUniqueId());
 
         String name = ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName());
@@ -490,8 +497,8 @@ public class Utils {
         player.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has equipped a " + Objects.requireNonNull(item.getItemMeta()).getDisplayName());
         player.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GREEN + " has equipped a " + Objects.requireNonNull(item.getItemMeta()).getDisplayName());
 
-        ConfigurationSection configSection = Utils.getConfig("items", name, "");
-        ConfigurationSection statsSection = Utils.getConfig("items", name, "stats");
+        ConfigurationSection configSection = ToT.Utils.Utils.getConfig("items", name, "");
+        ConfigurationSection statsSection = ToT.Utils.Utils.getConfig("items", name, "stats");
 
         List<String> list = new ArrayList<>();
 
@@ -522,7 +529,7 @@ public class Utils {
                 getServer().getConsoleSender().sendMessage(String.join("\n", list));
             }
 
-            if(configSection.contains("set")) {
+            if (configSection.contains("set")) {
                 updateSet(player, data, stats, "added");
             }
 
@@ -531,7 +538,7 @@ public class Utils {
 
     public static void removeStats(Player player, ItemStack item) {
 
-        TPlayer data = PartyManagment.getData(player.getUniqueId());
+        TPlayer data = getPlayerData(player.getUniqueId());
         Data stats = new Data(player.getUniqueId());
 
         String name = ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName());
@@ -657,7 +664,7 @@ public class Utils {
 
         List<String> lore = new ArrayList<>();
         lore.add("");
-        if(itemData.get("attackSpeed") != null) {
+        if (itemData.get("attackSpeed") != null) {
             lore.add(ChatColor.GRAY + itemData.getString("attackSpeed") + " Attack Speed");
             lore.add("");
         }
@@ -667,16 +674,17 @@ public class Utils {
                 String value = itemStats.getString(stat);
                 String cond = "-";
                 assert value != null;
-                if (Integer.parseInt(value.replace("%","")) > 0) {
+                if (Integer.parseInt(value.replace("%", "")) > 0) {
                     cond = "+";
                 }
-                lore.add(ChatColor.GREEN + cond + value + " " + ChatColor.GRAY + stat);
+                // lore.add(getSymbol(stat) + " " + ChatColor.GREEN + cond + value + " " + ChatColor.GRAY + stat);
+                lore.add(getSymbol(stat) + " " + getColor(stat) + stat + ": " + ChatColor.GREEN + cond + value);
             }
         }
 
         String set = itemData.getString("set");
 
-        if(set != null) {
+        if (set != null) {
 
             File yamlFile2 = new File(plugin.getDataFolder() + "/data/sets/" + set + ".yml");
 
@@ -698,7 +706,7 @@ public class Utils {
                     if (value != null && Integer.parseInt(value.replace("%", "")) > 0) {
                         cond = "+";
                     }
-                    lore.add(ChatColor.GREEN + cond + value + " " + ChatColor.GRAY + stat);
+                    lore.add(getSymbol(stat) + " " + getColor(stat) + stat + ": " + ChatColor.GREEN + cond + value);
                 }
                 ConfigurationSection ifSection = configSection2.getConfigurationSection("if");
                 if (ifSection != null) {
@@ -708,12 +716,12 @@ public class Utils {
                         if (daySection != null) {
                             for (String stat2 : daySection.getKeys(false)) {
                                 String value2 = daySection.getString(stat2);
-                                if(value2 != null) {
+                                if (value2 != null) {
                                     String cond2 = "-";
                                     if (Integer.parseInt(value2.replace("%", "")) > 0) {
                                         cond2 = "+";
                                     }
-                                    lore.add(ChatColor.GREEN + cond2 + value2 + " " + ChatColor.GRAY + stat2 + ChatColor.YELLOW + " (at Day)");
+                                    lore.add(getSymbol(stat2) + " " + getColor(stat2) + stat2 + ": " + ChatColor.GREEN + cond2 + value2 + ChatColor.YELLOW + " (at Day)");
                                 }
                             }
                         }
@@ -721,12 +729,12 @@ public class Utils {
                         if (nightSection != null) {
                             for (String stat2 : nightSection.getKeys(false)) {
                                 String value2 = nightSection.getString(stat2);
-                                if(value2 != null) {
+                                if (value2 != null) {
                                     String cond2 = "-";
                                     if (Integer.parseInt(value2.replace("%", "")) > 0) {
                                         cond2 = "+";
                                     }
-                                    lore.add(ChatColor.GREEN + cond2 + value2 + " " + ChatColor.GRAY + stat2 + ChatColor.YELLOW + " (at Night)");
+                                    lore.add(getSymbol(stat2) + " " + getColor(stat2) + stat2 + ": " + ChatColor.GREEN + cond2 + value2 + ChatColor.YELLOW + " (at Night)");
                                 }
                             }
                         }
@@ -749,7 +757,7 @@ public class Utils {
         }
         item.setItemMeta(itemMeta);
 
-        if(itemData.contains("color")) {
+        if (itemData.contains("color")) {
             LeatherArmorMeta leather_armor_meta = (LeatherArmorMeta) item.getItemMeta();
             String colorData = itemData.getString("color");
             assert colorData != null;
@@ -802,6 +810,16 @@ public class Utils {
         return romanNumeral.toString();
     }
 
+    public static <T> T arrayRandom(T[] array) {
+        if (array == null || array.length == 0) {
+            throw new IllegalArgumentException("Array is empty or null");
+        }
+        Random random = new Random();
+        int index = random.nextInt(array.length);
+
+        return array[index];
+    }
+
     public static int generateRandomInteger(int min, int max) {
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
@@ -818,7 +836,7 @@ public class Utils {
 
     public static String getSet(ItemStack item) {
         if(item == null) return "";
-        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName()), "");
+        ConfigurationSection config = ToT.Utils.Utils.getConfig("items", ChatColor.stripColor(Objects.requireNonNull(item.getItemMeta()).getDisplayName()), "");
 
         return config.getString("set");
     }
@@ -829,7 +847,7 @@ public class Utils {
         if(!item.hasItemMeta()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
         if(!Objects.requireNonNull(item.getItemMeta()).hasDisplayName()) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
 
-        ConfigurationSection config = Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "stats");
+        ConfigurationSection config = ToT.Utils.Utils.getConfig("items", ChatColor.stripColor(item.getItemMeta().getDisplayName()), "stats");
 
         if(config == null) return new int[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -843,6 +861,74 @@ public class Utils {
         magic = config.getInt("Magic");
 
         return new int[]{ 0, mana, str, 0, hp, def, speed, magic };
+    }
+
+    public static String HealthBar(Entity entity) {
+        Data stats = new Data(entity.getUniqueId());
+        double health = stats.hp;
+        StringBuilder healthBar = new StringBuilder(net.md_5.bungee.api.ChatColor.DARK_RED + "[");
+        int barSize = 4;
+        double maxHealth = stats.max_hp;
+        double percentage = health / maxHealth;
+        int filledBars = (int) (percentage * barSize);
+
+        DecimalFormat decimalFormat = new DecimalFormat("0");
+        String formattedHealth = decimalFormat.format(health);
+
+        for(var i = 0; i < 4; i++) {
+            if(i == 2) healthBar.append(net.md_5.bungee.api.ChatColor.RED).append(formattedHealth);
+            if(i <= filledBars) healthBar.append(net.md_5.bungee.api.ChatColor.RED).append("|");
+            else healthBar.append(net.md_5.bungee.api.ChatColor.GRAY).append("|");
+        }
+        healthBar.append(net.md_5.bungee.api.ChatColor.DARK_RED).append("]");
+
+        return healthBar.toString();
+    }
+
+    public static TPlayer getPlayerData(UUID uuid) {
+        SpigotData.getInstance().enterEntity(uuid);
+
+        return ((TPlayer) SpigotData.getInstance().getEntity(uuid));
+    }
+
+    public static ItemStack createItemStack(Material material, int amount, String nbtKey, String nbtValue) {
+        ItemStack itemStack = new ItemStack(material, amount);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (nbtKey != null && nbtValue != null) {
+            assert itemMeta != null;
+            itemMeta.getPersistentDataContainer().set(
+                    Objects.requireNonNull(NamespacedKey.fromString(nbtKey)), PersistentDataType.STRING, nbtValue);
+        }
+
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    public static ChatColor getColor(String stat) {
+        if(stat.equals("Mana")) return ChatColor.AQUA;
+        if(stat.equals("Strength")) return ChatColor.DARK_RED;
+        if(stat.equals("Health")) return ChatColor.RED;
+        if(stat.equals("Defense")) return ChatColor.GRAY;
+        if(stat.equals("Speed")) return ChatColor.WHITE;
+        if(stat.equals("Magic")) return ChatColor.DARK_PURPLE;
+        if(stat.equals("Coins")) return ChatColor.GOLD;
+        if(stat.equals("Damage")) return ChatColor.DARK_RED;
+
+        return ChatColor.GRAY;
+    }
+
+    public static String getSymbol(String stat) {
+        if(stat.equals("Mana")) return getColor(stat) + "♦" + ChatColor.RESET;
+        if(stat.equals("Strength")) return getColor(stat) + "🗡" + ChatColor.RESET;
+        if(stat.equals("Health")) return getColor(stat) + "❤" + ChatColor.RESET;
+        if(stat.equals("Defense")) return getColor(stat) + "🛡" + ChatColor.RESET;
+        if(stat.equals("Speed")) return getColor(stat) + "→" + ChatColor.RESET;
+        if(stat.equals("Magic")) return getColor(stat) + "🧪" + ChatColor.RESET;
+        if(stat.equals("Coins")) return getColor(stat) + "₿" + ChatColor.RESET;
+        if(stat.equals("Damage")) return getColor(stat) + "🗡" + ChatColor.RESET;
+
+        return "";
     }
 
 }
