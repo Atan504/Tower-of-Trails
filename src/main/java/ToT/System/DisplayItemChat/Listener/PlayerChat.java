@@ -1,11 +1,14 @@
-package ToT.Listener;
+package ToT.System.DisplayItemChat.Listener;
 
 import ToT.Utils.TextComponentUtil;
 import ToT.Utils.Utils;
 import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.ItemTag;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +23,7 @@ import java.util.List;
 
 import static ToT.Main.plugin;
 
-public class DisplayItemChat implements Listener {
+public class PlayerChat implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -83,4 +86,5 @@ public class DisplayItemChat implements Listener {
 
         }
     }
+
 }
